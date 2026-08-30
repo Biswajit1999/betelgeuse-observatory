@@ -28,7 +28,7 @@ def fixed_mode_radius_ratio(period_ratio: float) -> float:
 
     if period_ratio <= 0:
         raise ValueError("period_ratio must be positive")
-    return period_ratio ** (2.0 / 3.0)
+    return float(period_ratio ** (2.0 / 3.0))
 
 
 def shock_crossing_hours(radius_solar: float, shock_velocity_km_s: float) -> float:
@@ -74,12 +74,12 @@ def ideal_gas_sound_speed_km_s(
         raise ValueError("temperature_k must be positive")
     if mean_molecular_weight <= 0 or gamma <= 0:
         raise ValueError("mean_molecular_weight and gamma must be positive")
-    return math.sqrt(
-        gamma
-        * BOLTZMANN_J_K
-        * temperature_k
-        / (mean_molecular_weight * HYDROGEN_MASS_KG)
-    ) / 1000.0
+    return (
+        math.sqrt(
+            gamma * BOLTZMANN_J_K * temperature_k / (mean_molecular_weight * HYDROGEN_MASS_KG)
+        )
+        / 1000.0
+    )
 
 
 def standardized_image_difference(

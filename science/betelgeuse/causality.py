@@ -6,10 +6,10 @@ conditioned on the state whose photons are received now.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
 import math
 import random
-from typing import Iterable
+from collections.abc import Iterable
+from dataclasses import dataclass
 
 LIGHT_YEARS_PER_PARSEC = 3.261563777
 

@@ -6,11 +6,27 @@ from collections.abc import Mapping
 
 REQUIRED_PRODUCT_FIELDS = frozenset(
     {
-        "dataset_id", "target", "observatory", "telescope", "instrument",
-        "programme_id", "observation_start", "observation_end", "spectral_coverage",
-        "bandwidth", "spatial_resolution", "spectral_resolution", "processing_level",
-        "units", "source_url", "publication", "licence", "sha256", "local_path",
-        "downloaded_at", "pipeline_version",
+        "dataset_id",
+        "target",
+        "observatory",
+        "telescope",
+        "instrument",
+        "programme_id",
+        "observation_start",
+        "observation_end",
+        "spectral_coverage",
+        "bandwidth",
+        "spatial_resolution",
+        "spectral_resolution",
+        "processing_level",
+        "units",
+        "source_url",
+        "publication",
+        "licence",
+        "sha256",
+        "local_path",
+        "downloaded_at",
+        "pipeline_version",
     }
 )
 

@@ -6,8 +6,8 @@ from science.betelgeuse.prediction import (
     conditioned_signal_arrival_year,
     fixed_mode_radius_ratio,
     ideal_gas_sound_speed_km_s,
-    shock_crossing_hours,
     shell_angular_diameter_arcmin,
+    shock_crossing_hours,
     standardized_image_difference,
 )
 
@@ -34,9 +34,7 @@ class PredictionPrimitiveTests(unittest.TestCase):
     def test_ballistic_ejecta_scale(self) -> None:
         radius = ballistic_ejecta_radius_pc(100, 5_000)
         self.assertAlmostEqual(radius, 0.511356, places=5)
-        self.assertAlmostEqual(
-            shell_angular_diameter_arcmin(radius, 172), 20.440846, places=5
-        )
+        self.assertAlmostEqual(shell_angular_diameter_arcmin(radius, 172), 20.440846, places=5)
 
     def test_invalid_ballistic_inputs_are_rejected(self) -> None:
         with self.assertRaises(ValueError):

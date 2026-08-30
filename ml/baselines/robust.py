@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from statistics import median
-from typing import Sequence
 
 
 def modified_z_scores(values: Sequence[float]) -> tuple[float, ...]:

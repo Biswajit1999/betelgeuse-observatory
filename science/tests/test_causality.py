@@ -7,7 +7,10 @@ from science.betelgeuse.causality import DistancePosterior, propagate_causality
 
 class CausalityTests(unittest.TestCase):
     def test_distance_cancels_from_arrival_time(self) -> None:
-        for distance in (DistancePosterior(150, 0.001, 0.001), DistancePosterior(220, 0.001, 0.001)):
+        for distance in (
+            DistancePosterior(150, 0.001, 0.001),
+            DistancePosterior(220, 0.001, 0.001),
+        ):
             summary = propagate_causality(2026, 300, distance, samples=2_000, seed=7)
             self.assertAlmostEqual(summary.arrival_year.median, 2326.0, places=9)
             self.assertAlmostEqual(summary.arrival_year.lower, 2326.0, places=9)

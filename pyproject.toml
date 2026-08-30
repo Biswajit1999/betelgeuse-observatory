@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "betelgeuse-observatory"
-version = "0.1.0"
+version = "1.0.0"
 description = "Causal, uncertainty-aware analysis tools for Betelgeuse observations"
 readme = "README.md"
 requires-python = ">=3.12,<3.15"

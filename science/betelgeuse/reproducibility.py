@@ -2,11 +2,11 @@
 
 from __future__ import annotations
 
+import platform
+import subprocess
 from dataclasses import asdict, dataclass
 from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
-import platform
-import subprocess
 
 
 @dataclass(frozen=True)
