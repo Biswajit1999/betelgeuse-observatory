@@ -1,0 +1,18 @@
+cff-version: 1.2.0
+message: 'If you use this software, cite this repository and every underlying observational dataset and paper.'
+title: 'Betelgeuse Observatory'
+type: software
+authors:
+  - family-names: 'Jana'
+    given-names: 'Biswajit'
+version: 1.0.0
+date-released: 2026-08-31
+repository-code: 'https://github.com/Biswajit1999/betelgeuse-observatory'
+license: BSD-3-Clause
+abstract: 'Causal, uncertainty-aware tools for analysing received observations of Betelgeuse and comparing conditional evolutionary scenarios.'
+keywords:
+  - Betelgeuse
+  - red supergiant
+  - light-travel time
+  - ALMA
+  - reproducible astronomy

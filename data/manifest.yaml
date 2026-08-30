@@ -1,0 +1,151 @@
+schema_version: '1.0.0'
+target: Betelgeuse
+aliases: [Alpha Orionis, HD 39801]
+policy:
+  raw_data_committed: false
+  note: Large or access-controlled products are represented by metadata and reproducible retrieval instructions only.
+
+products:
+  - dataset_id: alma_2023_programme
+    target: Betelgeuse
+    observatory: ALMA
+    telescope: Atacama Large Millimeter/submillimeter Array
+    instrument: ALMA Bands 6, 7, and 8
+    programme_id: ADS/JAO.ALMA#2022.A.00026.S
+    observation_start: 2023-08-01
+    observation_end: 2023-08-27
+    publication_date: 2026-08-19
+    spectral_coverage: 214.800-492.200 GHz
+    bandwidth: 7.5 GHz per band; 1.875 GHz per spectral window
+    spatial_resolution: 19.6x14.1 mas (Band 6); 10.7x9.5 mas (Band 7); 7.7x6.6 mas (Band 8)
+    spectral_resolution: 1.95 MHz after Hanning smoothing
+    processing_level: calibrated measurement sets and restored images; archive retrieval required
+    units: visibility-dependent; images Jy/beam; spectra Jy/beam
+    source_url: https://almascience.eso.org/aq/?project_code=2022.A.00026.S
+    publication: https://arxiv.org/abs/2608.19339
+    licence: ALMA archive data policy applies; paper is CC BY 4.0
+    sha256: null
+    local_path: null
+    downloaded_at: null
+    pipeline_version: null
+    status: metadata_only
+
+  - dataset_id: alma_2015_programme
+    target: Betelgeuse
+    observatory: ALMA
+    telescope: Atacama Large Millimeter/submillimeter Array
+    instrument: ALMA Band 7
+    programme_id: ADS/JAO.ALMA#2015.1.00206.S
+    observation_start: 2015-11-09
+    observation_end: 2015-11-09
+    publication_date: 2017-06-19
+    spectral_coverage: approximately 338 GHz continuum and spectral-line setup
+    bandwidth: see archive metadata
+    spatial_resolution: approximately 18 mas; harmonise to comparison beam before epoch differencing
+    spectral_resolution: see archive metadata
+    processing_level: archive products; retrieval required
+    units: visibility-dependent; restored images Jy/beam
+    source_url: https://almascience.eso.org/aq/?project_code=2015.1.00206.S
+    publication: https://doi.org/10.1051/0004-6361/201730755
+    licence: ALMA archive data policy applies
+    sha256: null
+    local_path: null
+    downloaded_at: null
+    pipeline_version: null
+    status: metadata_only
+
+  - dataset_id: eso_sphere_zimpol_2024
+    target: Betelgeuse
+    observatory: ESO Paranal Observatory
+    telescope: Very Large Telescope
+    instrument: SPHERE-ZIMPOL
+    programme_id: 114.28H9
+    observation_start: 2024-12-06
+    observation_end: 2024-12-06
+    publication_date: 2026-08-19
+    spectral_coverage: CntHa and associated ZIMPOL programme filters
+    bandwidth: see ESO archive release documentation
+    spatial_resolution: candidate separation 52.32 +/- 0.18 mas; not an instrumental resolution value
+    spectral_resolution: imaging filters; not applicable
+    processing_level: raw and reduced high-contrast imaging products available from ESO
+    units: archive-product dependent
+    source_url: https://archive.eso.org/cms/eso-archive-news/release-of-sphere-data-betelgeuse.html
+    publication: https://doi.org/10.18727/archive/114
+    licence: ESO archive and data-product reuse conditions apply
+    sha256: null
+    local_path: null
+    downloaded_at: null
+    pipeline_version: null
+    status: metadata_only
+
+  - dataset_id: aavso_alpha_orionis_photometry
+    target: Alpha Orionis
+    observatory: AAVSO International Database
+    telescope: heterogeneous observer network
+    instrument: heterogeneous visual and photoelectric/CCD photometry
+    programme_id: AAVSO-AID-target-alpha-ori
+    observation_start: null
+    observation_end: null
+    publication_date: null
+    spectral_coverage: multiple passbands; query-dependent
+    bandwidth: filter-dependent
+    spatial_resolution: unresolved photometry
+    spectral_resolution: not applicable
+    processing_level: validated observation records; query/export required
+    units: magnitudes and reported uncertainties
+    source_url: https://www.aavso.org/data-download
+    publication: https://www.aavso.org/aavso-international-database-aid
+    licence: AAVSO data policy and acknowledgement requirements apply
+    sha256: null
+    local_path: null
+    downloaded_at: null
+    pipeline_version: null
+    status: manual_or_authenticated_retrieval
+
+  - dataset_id: mast_hst_betelgeuse_uv
+    target: Betelgeuse
+    observatory: Hubble Space Telescope
+    telescope: HST
+    instrument: STIS/GHRS; select ASTRAL-compatible calibrated products
+    programme_id: query-dependent
+    observation_start: null
+    observation_end: null
+    publication_date: null
+    spectral_coverage: ultraviolet; product-dependent
+    bandwidth: product-dependent
+    spatial_resolution: aperture/product-dependent
+    spectral_resolution: grating/product-dependent
+    processing_level: calibrated archive spectra
+    units: calibrated flux and wavelength arrays; product-dependent
+    source_url: https://mast.stsci.edu/portal/Mashup/Clients/Mast/Portal.html
+    publication: https://archive.stsci.edu/prepds/astral/
+    licence: MAST public-data policy and dataset acknowledgements apply
+    sha256: null
+    local_path: null
+    downloaded_at: null
+    pipeline_version: null
+    status: query_required
+
+  - dataset_id: alma_2023_band8_editorial_preview
+    target: Betelgeuse
+    observatory: ALMA
+    telescope: Atacama Large Millimeter/submillimeter Array
+    instrument: ALMA Band 8
+    programme_id: ADS/JAO.ALMA#2022.A.00026.S
+    observation_start: 2023-08-01
+    observation_end: 2023-08-01
+    publication_date: 2026-08-19
+    spectral_coverage: 485.22 GHz mean continuum
+    bandwidth: 7.5 GHz continuum
+    spatial_resolution: 7.7x6.6 mas at position angle 2 degrees
+    spectral_resolution: continuum product
+    processing_level: paper figure; editorial/educational preview only, not ML input
+    units: Jy/beam colour scale in source figure
+    source_url: https://arxiv.org/html/2608.19339v1/Fig1c_BetelB8_SUR_v2.png
+    publication: https://arxiv.org/abs/2608.19339
+    licence: CC BY 4.0; attribution to Dent et al. (2026)
+    sha256: 53be57f75f0d858de1f6f7120cdc679397333f7ab8324a652586d3e0c0eda8ad
+    local_path: public/observations/alma-band8-2023.png
+    downloaded_at: 2026-08-30
+    pipeline_version: direct-source-figure-v1
+    status: committed_editorial_preview

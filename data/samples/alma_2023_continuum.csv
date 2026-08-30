@@ -1,0 +1,4 @@
+frequency_ghz,integrated_flux_jy,flux_uncertainty_jy,angular_diameter_mas,brightness_temperature_k,observation_date,source
+223.55,0.28,0.014,62.14,2342,2023-08-03/2023-08-27,https://arxiv.org/abs/2608.19339
+337.99,0.51,0.04,57.74,2294,2023-08-03/2023-08-04,https://arxiv.org/abs/2608.19339
+485.22,0.90,0.09,54.30,2266,2023-08-01,https://arxiv.org/abs/2608.19339
