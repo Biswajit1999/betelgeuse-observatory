@@ -5,7 +5,7 @@ This file records the verified project-specific interpretation of the UI/UX audi
 ## Direction
 
 - Narrative scientific instrument: cinematic opening, then a working causality surface in the first viewport.
-- Near-black neutral background, warm stellar amber for measured radiation, cool cyan for received/derived information, and violet only for model-dependent quantities.
+- White reading canvas by default, with a paired near-black night theme. Warm stellar amber marks measured radiation, cool cyan marks received/derived information, and violet is reserved for model-dependent quantities.
 - No decorative glass, particles, exaggerated sci-fi type, or animation without scientific meaning.
 - Use Geist for prose and Geist Mono for measurements; all scientific values use tabular figures.
 - Layout follows an 8px rhythm, a readable 72-character prose measure, and 24px minimum web pointer targets with 44px targets for primary controls.
@@ -21,6 +21,13 @@ This file records the verified project-specific interpretation of the UI/UX audi
 | Speculative     | `--speculative` | `#a8adb7` | hatched field / `SPECULATIVE` label |
 
 Colour never carries evidence class by itself.
+
+## Theme behaviour
+
+- The initial preference is Day. The header offers Day, Night, and Device choices; Device follows `prefers-color-scheme` and responds to operating-system changes.
+- A deliberate choice is stored locally and restored before the page paints to avoid a theme flash.
+- Scientific imagery, contour maps, and the WebGL stellar viewport may retain dark instrument backgrounds inside Day mode; surrounding reading surfaces, controls, equations, tables, and quantitative plots use light semantic tokens.
+- Theme controls use native buttons, visible selected state, a labelled fieldset, keyboard focus, and a minimum 44 px pointer target.
 
 ## Interaction and motion
 
@@ -39,6 +46,7 @@ Colour never carries evidence class by itself.
 ## Pre-delivery audit
 
 - Text contrast is at least 4.5:1; data marks and control boundaries are at least 3:1.
+- Day, Night, and Device modes are tested independently, including a live system-theme change while Device is selected.
 - Focus order matches reading order and a skip link targets the main region.
 - Reduced motion, 200% zoom, 375px viewport, keyboard-only use, and no-colour interpretation are tested.
 - Observation date and publication date are separate fields on every observational product.

@@ -4,6 +4,7 @@ import { ArrowDown, Database, Telescope } from 'lucide-react';
 import { CausalityLab } from '@/components/causality-lab';
 import { LightSignal } from '@/components/light-signal';
 import { ResearchAtlas } from '@/components/research-atlas';
+import { ThemeSwitcher } from '@/components/theme-switcher';
 import { siteAsset } from '@/lib/site-path';
 
 export default function Home() {
@@ -21,11 +22,14 @@ export default function Home() {
           <span className="wordmark-mark" aria-hidden="true" />
           <span>Betelgeuse Observatory</span>
         </a>
-        <nav aria-label="Primary navigation">
-          <a href="#observations">Observations</a>
-          <a href="#causality-lab">Causality</a>
-          <a href="#methods">Methods</a>
-        </nav>
+        <div className="header-actions">
+          <nav aria-label="Primary navigation">
+            <a href="#observations">Observations</a>
+            <a href="#causality-lab">Causality</a>
+            <a href="#methods">Methods</a>
+          </nav>
+          <ThemeSwitcher />
+        </div>
       </header>
 
       <section id="top" className="hero-shell" aria-labelledby="hero-title">

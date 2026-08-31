@@ -26,6 +26,35 @@
 }
 
 :root {
+  color-scheme: light;
+  --background: #ffffff;
+  --foreground: #151719;
+  --card: #f8f8f6;
+  --card-foreground: #151719;
+  --primary: #9b5700;
+  --primary-foreground: #ffffff;
+  --secondary: #e7f4f6;
+  --secondary-foreground: #123f46;
+  --muted: #f0f1ef;
+  --muted-foreground: #52585f;
+  --border: #d3d6d8;
+  --ring: #087f91;
+  --measured: #9b5700;
+  --calculated: #087f91;
+  --simulated: #6551b5;
+  --model: #a83263;
+  --speculative: #62676d;
+  --surface: #ffffff;
+  --surface-raised: #f8f8f6;
+  --surface-subtle: #f0f1ef;
+  --text-soft: #3f454b;
+  --plot-grid: #d9dcde;
+  --plot-axis: #697077;
+  --control-active: #dff2f4;
+  --shadow: rgba(25, 29, 32, 0.14);
+}
+.dark {
+  color-scheme: dark;
   --background: #060708;
   --foreground: #f4f1e9;
   --card: #0d0f11;
@@ -43,6 +72,14 @@
   --simulated: #b9a7ff;
   --model: #f08fb7;
   --speculative: #a8adb7;
+  --surface: #060708;
+  --surface-raised: #0d0f11;
+  --surface-subtle: #17191c;
+  --text-soft: #c1c4c9;
+  --plot-grid: #25282b;
+  --plot-axis: #7f848b;
+  --control-active: #112128;
+  --shadow: rgba(0, 0, 0, 0.36);
 }
 * {
   box-sizing: border-box;
@@ -2070,6 +2107,283 @@ a {
   outline: 2px solid var(--calculated);
   outline-offset: 3px;
 }
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+.theme-switcher {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px;
+  border: 1px solid var(--border);
+  background: var(--surface-raised);
+}
+.theme-switcher button {
+  min-width: 44px;
+  min-height: 38px;
+  padding: 0 0.6rem;
+  border: 0;
+  background: transparent;
+  color: var(--muted-foreground);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  cursor: pointer;
+  font: 600 0.66rem/1 var(--font-geist-mono);
+}
+.theme-switcher button:hover {
+  color: var(--foreground);
+  background: var(--muted);
+}
+.theme-switcher button[aria-pressed='true'] {
+  color: var(--foreground);
+  background: var(--surface);
+  box-shadow: 0 1px 5px var(--shadow);
+}
+
+/* Day mode keeps scientific imagery dark while moving the reading surface,
+   controls, tables, equations, and quantitative plots onto light tokens. */
+html:not(.dark) main :where(p, small, dt, th, td, label, figcaption, span) {
+  color: var(--muted-foreground);
+}
+html:not(.dark) main :where(h1, h2, h3, h4, strong, .equation) {
+  color: var(--foreground);
+}
+html:not(.dark) .wordmark,
+html:not(.dark) .wordmark span {
+  color: var(--foreground);
+}
+html:not(.dark) .wordmark-mark {
+  box-shadow:
+    inset 0 0 0 3px var(--background),
+    0 0 0 1px color-mix(in srgb, var(--measured) 50%, var(--border));
+}
+html:not(.dark) .site-header nav a {
+  color: var(--muted-foreground);
+}
+html:not(.dark) .site-header nav a:hover {
+  color: var(--foreground);
+}
+html:not(.dark)
+  main
+  :where(
+    .primary-link,
+    output,
+    .section-index span,
+    .observation-card a,
+    .scenario-panel a,
+    .watch-copy a,
+    .plot-data-table a,
+    .history-download,
+    .history-source-note a,
+    .analysis-source a,
+    .forecast-branches a,
+    .site-footer a,
+    .blink-download,
+    .blink-contact a
+  ) {
+  color: var(--calculated);
+}
+html:not(.dark)
+  main
+  :where(.eyebrow, .evidence-tag.measured, .wave-table td:first-child) {
+  color: var(--measured);
+}
+html:not(.dark) main :where(.evidence-tag.calculated, .control-label output) {
+  color: var(--calculated);
+}
+html:not(.dark) main .evidence-tag.model {
+  color: var(--model);
+}
+html:not(.dark) main .evidence-tag.simulated {
+  color: var(--simulated);
+}
+html:not(.dark)
+  main
+  :where(
+    .observation-frame,
+    .controls,
+    .calculation-panel,
+    .derivation,
+    .causality-timeline,
+    .observation-card,
+    .wave-table,
+    .plot-card,
+    .plot-data-table,
+    .history-suite,
+    .history-controls,
+    .contour-suite-heading,
+    .contour-card,
+    .radial-diagnostic-card,
+    .analysis-card,
+    .inference-matrix article,
+    .forecast-declaration,
+    .scenario-tabs,
+    .know-grid > div,
+    .stellar-simulation-header,
+    .stellar-readouts,
+    .stellar-physics-controls,
+    .stellar-timeline-controls
+  ) {
+  background: var(--surface-raised);
+  border-color: var(--border);
+}
+html:not(.dark)
+  main
+  :where(
+    .equation-block,
+    .forecast-readout,
+    .inference-note,
+    .watch-equation,
+    .simulation-equation,
+    .contour-equations,
+    .blink-file-help
+  ) {
+  background: var(--surface-subtle);
+}
+html:not(.dark)
+  main
+  :where(
+    .site-header,
+    .light-time-strip,
+    .lab-grid,
+    .calculation-grid,
+    .method-note,
+    .atlas-section,
+    .observation-grid,
+    .history-equations,
+    .contour-grid,
+    .forecast-branches,
+    .pipeline,
+    .simulation-stages,
+    .stellar-scenario-controls,
+    .stellar-model-equations,
+    .site-footer
+  ) {
+  border-color: var(--border);
+}
+html:not(.dark)
+  main
+  :where(
+    .observation-card,
+    .controls,
+    .high-level-equations article,
+    .forecast-declaration > div,
+    .forecast-branches article,
+    .pipeline > div,
+    .simulation-stages > div,
+    .stellar-scenario-controls button,
+    .stellar-readouts > div,
+    .stellar-model-equations article
+  ) {
+  border-color: var(--border);
+}
+html:not(.dark)
+  main
+  :where(
+    .evidence-tag.measured,
+    .evidence-tag.calculated,
+    .evidence-tag.model,
+    .evidence-tag.simulated
+  ) {
+  border-color: currentColor;
+}
+html:not(.dark) [data-slot='slider-track'] {
+  background: #c9ced1 !important;
+}
+html:not(.dark) [data-slot='slider-thumb'] {
+  background: var(--surface) !important;
+}
+html:not(.dark)
+  main
+  :where(
+    .history-controls button,
+    .blink-controls button,
+    .blink-inputs input[type='file'],
+    .stellar-quality-control select,
+    .stellar-playback-row select,
+    .stellar-scenario-controls button,
+    .stellar-physics-heading button,
+    .stellar-playback-row button
+  ) {
+  background: var(--surface);
+  border-color: var(--border);
+  color: var(--foreground);
+}
+html:not(.dark)
+  main
+  :where(
+    .history-controls button[aria-pressed='true'],
+    .stellar-scenario-controls button[aria-pressed='true'],
+    .stellar-playback-row .stellar-play-button
+  ) {
+  background: var(--control-active);
+  color: var(--secondary-foreground);
+}
+html:not(.dark) .observation-frame {
+  box-shadow: 0 24px 70px var(--shadow);
+}
+html:not(.dark) :where(.plot-gridline, .profile-grid) {
+  stroke: var(--plot-grid);
+}
+html:not(.dark) :where(.plot-axis, .timeline-axis, .timeline-tick) {
+  stroke: var(--plot-axis);
+}
+html:not(.dark)
+  :where(.plot-tick, .plot-label, .plot-legend, .point-annotation) {
+  fill: var(--muted-foreground);
+}
+html:not(.dark) .plot-label,
+html:not(.dark) .point-annotation {
+  fill: var(--text-soft);
+}
+html:not(.dark) .plot-reference {
+  stroke: var(--plot-axis);
+}
+html:not(.dark) .plot-error {
+  stroke: var(--foreground);
+}
+html:not(.dark)
+  :where(
+    .plot-point,
+    .diameter-point,
+    .history-v-point,
+    .history-herschel-point
+  ) {
+  stroke: var(--surface-raised);
+}
+html:not(.dark)
+  :where(.timeline-tick-label, .timeline-path-label, .timeline-event text) {
+  fill: var(--muted-foreground);
+}
+html:not(.dark) .timeline-path-label {
+  fill: var(--text-soft);
+}
+html:not(.dark) .timeline-event line {
+  stroke: var(--plot-axis);
+}
+html:not(.dark) .timeline-event circle {
+  stroke: var(--surface-raised);
+}
+html:not(.dark) .timeline-event.receive circle {
+  fill: var(--foreground);
+}
+html:not(.dark)
+  :where(.blink-overlay, .stellar-viewport-overlay)
+  :where(span, strong, small),
+html:not(.dark) .stellar-webgl-error {
+  color: #f1efe9;
+}
+html:not(.dark) .stellar-ejecta-readout {
+  background: #fff2ea;
+  color: #6f3a28;
+}
+html:not(.dark) .forecast-boundary,
+html:not(.dark) .stellar-boundary-note {
+  background: #fff3f8;
+}
 @media (max-width: 1100px) {
   .observation-grid {
     grid-template-columns: 1fr;
@@ -2104,6 +2418,12 @@ a {
 }
 @media (max-width: 900px) {
   .site-header nav {
+    display: none;
+  }
+  .header-actions {
+    gap: 0;
+  }
+  .theme-switcher button span {
     display: none;
   }
   .hero-shell {
