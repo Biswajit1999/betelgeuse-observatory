@@ -4,6 +4,7 @@ import { ArrowDown, Database, Telescope } from 'lucide-react';
 import { CausalityLab } from '@/components/causality-lab';
 import { LightSignal } from '@/components/light-signal';
 import { ResearchAtlas } from '@/components/research-atlas';
+import { siteAsset } from '@/lib/site-path';
 
 export default function Home() {
   return (
@@ -63,7 +64,7 @@ export default function Home() {
           </div>
           <div className="image-stage">
             <Image
-              src="/observations/alma-band8-2023.png"
+              src={siteAsset('/observations/alma-band8-2023.png')}
               alt="ALMA Band 8 continuum map of Betelgeuse observed in August 2023, showing a resolved asymmetric sub-millimetre photosphere"
               fill
               priority
@@ -125,6 +126,9 @@ export default function Home() {
         </p>
         <nav aria-label="Footer navigation">
           <a href="#author-forecast-title">Author forecast</a>
+          <a href="https://github.com/Biswajit1999/betelgeuse-observatory">
+            Repository
+          </a>
           <a href="https://arxiv.org/abs/2006.09837">Primary literature</a>
           <a href="#methods">Scientific boundary</a>
         </nav>

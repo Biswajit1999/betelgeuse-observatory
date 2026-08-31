@@ -8,7 +8,7 @@ Null values mean the archive query has not yet selected a product. They are not 
 
 - `data/raw/` and `data/interim/` are gitignored.
 - Multi-gigabyte ALMA visibility data are never committed.
-- Scientific ML uses calibrated FITS, spectra, or measurement sets, not rendered paper/press PNGs.
+- Scientific analysis uses calibrated FITS, spectra, or measurement sets, not rendered paper/press PNGs.
 - Small redistributable examples live in `data/samples/` with sources and hashes.
 - CASA is required for ALMA visibility calibration and interferometric imaging.
 

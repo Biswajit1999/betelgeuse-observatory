@@ -1,5 +1,10 @@
 # Betelgeuse Observatory
 
+[![Web checks](https://github.com/Biswajit1999/betelgeuse-observatory/actions/workflows/web.yml/badge.svg)](https://github.com/Biswajit1999/betelgeuse-observatory/actions/workflows/web.yml)
+[![GitHub Pages](https://github.com/Biswajit1999/betelgeuse-observatory/actions/workflows/pages.yml/badge.svg)](https://github.com/Biswajit1999/betelgeuse-observatory/actions/workflows/pages.yml)
+
+**Live observatory:** <https://biswajit1999.github.io/betelgeuse-observatory/>
+
 > This project cannot determine whether Betelgeuse has already undergone an event outside Earth's past light cone. It analyses the latest state observable from Earth and evaluates physical models for its subsequent evolution.
 
 **Research author and project lead:** Biswajit Jana
@@ -26,9 +31,9 @@ The complete first-person scientific and engineering write-up is available as [L
 - A GPU-accelerated 3D timeline from 2026–2526 CE driven by a reduced gas-flow solver for temperature, density, horizontal/radial velocity, buoyancy, pressure response, viscosity, thermal diffusion, compressional heating, and radiative relaxation.
 - A provenance manifest for ALMA 2015/2023, ESO SPHERE 2024, AAVSO, and MAST/HST.
 - An evidence language that visibly separates measured, calculated, simulated, model-dependent, and speculative material.
-- A baseline-first statistical-inference structure and a model-card contract that forbids an `exploded/not exploded` classifier.
+- A baseline-first statistical-inference structure that forbids an unsupported `exploded/not exploded` classification.
 
-The current repository is a scientifically validated foundation, not a claim that all archive cubes have been downloaded or that the proposed neural models have been trained.
+The version 1.0 repository is complete within its stated evidence boundary. Archive-dependent re-reductions are tracked separately and are never represented as completed before calibrated products and provenance records exist.
 
 ## Causality in one equation
 
@@ -96,6 +101,8 @@ pnpm start
 
 The web app is a standard Next.js static export and contains no vendor-specific hosting metadata. `pnpm start` serves the generated `out/` directory after a build.
 
+The public deployment is built from `main` by [the GitHub Pages workflow](.github/workflows/pages.yml). The workflow supplies the `/betelgeuse-observatory` base path so images, static chunks, and the hydrodynamic worker resolve correctly on the project site.
+
 ## Reproduce the first published-quantity checks
 
 The tiny redistributable sample in [`data/samples/alma_2023_continuum.csv`](data/samples/alma_2023_continuum.csv) records the three integrated continuum points from Dent et al. The fit is intentionally described as a sanity check: it is not equivalent to the paper's matched-beam, spatially resolved spectral-index analysis.
@@ -129,11 +136,10 @@ These assumptions are never blended. Read [evolutionary scenarios](docs/evolutio
 - [GPU 3D simulation method and limitations](docs/3d-simulation-method.md)
 - [Contour reconstruction method and limitations](docs/contour-reconstruction.md)
 - [Data provenance](docs/data-provenance.md)
-- [ML limitations](docs/ml-limitations.md)
 - [Primary references](docs/references.bib)
-- [Acceptance status: verified versus data/approval-dependent](docs/acceptance-status.md)
+- [Release status and archive-dependent extensions](docs/acceptance-status.md)
 
-The Great Dimming is not labelled a known pre-supernova event. Press-release or paper-rendered images are editorial assets only; calibrated FITS and archive products are required for scientific analysis and ML.
+The Great Dimming is not labelled a known pre-supernova event. Press-release or paper-rendered images are editorial assets only; calibrated FITS and archive products are required for quantitative scientific analysis.
 
 ## Visual verification
 

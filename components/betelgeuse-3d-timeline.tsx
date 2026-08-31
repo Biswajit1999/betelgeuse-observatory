@@ -8,6 +8,8 @@ import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 
+import { siteAsset } from '@/lib/site-path';
+
 type Scenario = 'preferred' | 'conditional';
 type Quality = 'high' | 'efficient';
 
@@ -430,7 +432,9 @@ export function Betelgeuse3DTimeline() {
     hydroTexture.colorSpace = THREE.NoColorSpace;
     hydroTexture.needsUpdate = true;
 
-    const hydroWorker = new Worker('/workers/betelgeuse-hydro-worker.js');
+    const hydroWorker = new Worker(
+      siteAsset('/workers/betelgeuse-hydro-worker.js'),
+    );
     workerRef.current = hydroWorker;
     let lastStatsUpdate = 0;
     hydroWorker.onmessage = (event: MessageEvent) => {

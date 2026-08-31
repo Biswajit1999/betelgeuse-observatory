@@ -139,7 +139,7 @@ products:
     bandwidth: 7.5 GHz continuum
     spatial_resolution: 7.7x6.6 mas at position angle 2 degrees
     spectral_resolution: continuum product
-    processing_level: paper figure; editorial/educational preview only, not ML input
+    processing_level: paper figure; editorial/educational preview only, not a quantitative-analysis input
     units: Jy/beam colour scale in source figure
     source_url: https://arxiv.org/html/2608.19339v1/Fig1c_BetelB8_SUR_v2.png
     publication: https://arxiv.org/abs/2608.19339

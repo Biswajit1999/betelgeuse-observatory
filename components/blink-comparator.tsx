@@ -5,6 +5,8 @@ import { ChangeEvent, useEffect, useRef, useState } from 'react';
 import { ChevronLeft, ChevronRight, Images, Pause, Play } from 'lucide-react';
 import { useReducedMotion } from 'motion/react';
 
+import { siteAsset } from '@/lib/site-path';
+
 const MAX_FRAMES = 5000;
 
 type Frame = { name: string; url: string };
@@ -69,7 +71,7 @@ export function BlinkComparator() {
       <div className="blink-stage">
         <Image
           key={current?.url ?? 'editorial-preview'}
-          src={current?.url ?? '/observations/alma-band8-2023.png'}
+          src={current?.url ?? siteAsset('/observations/alma-band8-2023.png')}
           alt={
             current
               ? `Locally selected comparison frame ${frameIndex + 1}: ${current.name}`

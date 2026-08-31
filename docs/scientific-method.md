@@ -25,6 +25,6 @@ The high-resolution ALMA study was submitted on 19 August 2026, but its five ALM
 1. Validate provenance and units.
 2. Reproduce simple published quantities.
 3. Build transparent statistical baselines.
-4. Add neural models only where they answer a defined observable-domain question.
+4. Add more complex models only where they answer a defined observable-domain question and outperform a transparent baseline on held-out epochs.
 5. Evaluate with temporal, epoch, instrument, and simulation-family hold-outs.
 6. Publish uncertainty, calibration, OOD behaviour, ablations, and a model card.

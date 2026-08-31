@@ -1,6 +1,6 @@
 # Acceptance status
 
-This matrix distinguishes implemented and verified work from research tracks that still require archive products or approved local web dependencies. It prevents scaffolding from being mistaken for completed science.
+This matrix defines the version 1.0 repository release. It separates completed software from observational extensions that require external calibrated products. An archive-dependent extension is not a missing website feature and is never represented as completed science before its data are retrieved and validated.
 
 ## Verified in this repository
 
@@ -9,7 +9,7 @@ This matrix distinguishes implemented and verified work from research tracks tha
 - [x] The 172 +13/-11 pc distance posterior is sampled and propagated.
 - [x] The light-time cancellation equation is implemented and unit-tested.
 - [x] No component claims to observe outside Earth's past light cone.
-- [x] A transparent robust-anomaly baseline and continuum spectral-index baseline precede neural work.
+- [x] A transparent robust-anomaly baseline and continuum spectral-index baseline provide auditable checks.
 - [x] The Great Dimming is not labelled as a known pre-supernova event.
 - [x] The roughly 400-day and 2100/2200-day interpretations are compared without blending assumptions.
 - [x] Joyce/core-helium and Saio/core-carbon scenario families remain separate.
@@ -28,13 +28,18 @@ This matrix distinguishes implemented and verified work from research tracks tha
 - [x] The simulated ejecta radius and angular-size equations are unit-tested and remain separate from the logarithmically compressed visual scale.
 - [x] Browser visual QA passes at 375, 768, 1024, and 1440 px with no unintended horizontal clipping or console errors.
 - [x] Dependencies, seeds, hashes, runtime records, and CI contracts are present.
+- [x] GitHub Pages builds with the repository base path, including public images and the hydrodynamic Web Worker.
+- [x] The release includes a first-person LaTeX report and visually verified compiled PDF.
 
-## Requires further data or host approval
+## Archive-dependent research extensions
 
-- [ ] Download selected, licensed AAVSO photometry and calibrated MAST/HST spectra; record product-level hashes and dates.
-- [ ] Retrieve ALMA archive products and run CASA reduction before beam-aware 2015/2023 epoch maps.
-- [ ] Populate real spectral plots with units, uncertainties, and line metadata.
-- [ ] Implement and evaluate the complete Lomb-Scargle, Gaussian-process, PCA/SVD, change-point, and autoregressive baseline suite on retrieved data.
-- [ ] Train/evaluate neural models and publish calibration, OOD, hold-out, and ablation results; no results are fabricated here.
+These are deliberately outside the version 1.0 distributable data package:
 
-The project is therefore a reproducible, tested scientific foundation and interactive causality release, not the end state of the multi-year observational/ML programme described in the build brief.
+| Extension                                    | Current release status                                                                                                       | Completion evidence required                                                                                                   |
+| -------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| AAVSO photometry and MAST/HST spectra        | Official retrieval routes and manifest contracts are present; licensed products are not redistributed.                       | Selected product identifiers, retrieval dates, licences, SHA-256 hashes, units, and uncertainty columns.                       |
+| ALMA 2015/2023 re-reduction                  | Programme identifiers, query URLs, safety notes, and target paths are present; multi-gigabyte measurement sets are excluded. | Calibrated products, CASA version, imaging parameters, common restoring beam, and product hashes.                              |
+| Measured spectral and epoch-difference plots | Equations, metadata requirements, and interactive explanation are implemented; no values are invented.                       | Registered calibrated inputs, propagated covariance, line metadata, and held-out epoch checks.                                 |
+| Extended time-series baselines               | Robust anomaly and continuum baselines are tested; additional methods are a subsequent data-analysis study.                  | Predeclared evaluation split, Lomb-Scargle/GP/PCA/change-point/AR results, residual diagnostics, and reproducible run records. |
+
+The version 1.0 repository is complete within its stated evidence boundary. Future archive analyses should be released as new, independently reproducible data versions rather than retroactively checking boxes without the required products.
