@@ -357,13 +357,13 @@ My prediction should change if calibrated evidence establishes the 2200 day sign
 
 The three-dimensional view covers received years 2026--2526 and has two explicitly distinct branches. The default branch follows the preferred long-horizon interpretation and therefore does not explode within the 500-year window. A conditional branch lets the reader impose a collapse arrival between 2056 and 2326 to inspect the visual consequences of the contested scenario. The control is an assumption switch, not a prediction generator.
 
-The renderer uses a displaced sphere, a dynamic surface texture, a translucent atmosphere, particles, and bloom. GPU quality modes adjust mesh and gas-grid resolution. The observed angular scale anchors the star, while the camera supports orbit and zoom. Temperature controls emitted colour qualitatively; radial velocity and density perturb the surface geometry; flow speed changes fine structure.
+The renderer distinguishes two measured emitting layers. The near-infrared continuum uses the $42.49\pm0.06$ mas limb-darkened diameter, $3690\pm54$ K effective temperature, and power-law limb exponent $0.097\pm0.005$ reported by Ohnaka et al.\ \cite{ohnaka2011}. The selectable ALMA Band 7 view uses a 57.74 mas angular diameter and an approximately 2300 K sub-millimetre brightness-temperature layer, with the hottest published patch represented as about 800 K above that mean \cite{dent2026}. The renderer uses a mildly displaced sphere, dynamic surface fields, a translucent extended atmosphere, particles, and restrained bloom. GPU quality modes adjust mesh and gas-grid resolution. Radial surface displacements are capped at approximately the observed percent-level departure from circular symmetry rather than producing large lava-like corrugations.
 
 For a blackbody reference, the spectral radiance is
 \begin{equation}
 B_\nu(T)=\frac{2h\nu^3}{c^2}\left[\exp\left(\frac{h\nu}{k_BT}\right)-1\right]^{-1}.
 \end{equation}
-The WebGL colour mapping is not a radiative-transfer solution and is not labelled as calibrated intensity. It is a visual encoding of the evolving surface fields.
+The near-infrared colour mapping uses the ratio of Planck radiances to constrain relative continuum brightness and the measured power-law limb darkening. The ALMA option is explicitly labelled false colour because its brightness temperature is not an optical surface colour. Neither mode is a radiative-transfer solution or calibrated intensity map; both are visual encodings of the evolving reduced surface fields.
 
 \section{Reduced gas-flow and thermodynamic solver}
 
@@ -376,7 +376,7 @@ The solver is guided by reduced conservation laws on a spherical surface. Mass c
 horizontal momentum by
 \begin{equation}
 \frac{D\bm{u}_h}{Dt}=-\frac{1}{\rho}\nabla_h p
--2\bm{\Omega}\times\bm{u}_h+\nu\nabla_h^2\bm{u}_h-\gamma_u\bm{u}_h+\bm{S}_u,
++\nu\nabla_h^2\bm{u}_h-\gamma_u\bm{u}_h+\bm{S}_u,
 \end{equation}
 and radial motion by
 \begin{equation}
@@ -394,16 +394,18 @@ c_s=\sqrt{\frac{\gamma k_BT}{\mu m_{\rm H}}},\qquad
 \mathcal{M}_{\rm rms}=\frac{v_{\rm rms}}{c_s}.
 \end{equation}
 
-Semi-Lagrangian backtracing performs advection. Centered finite differences approximate gradients, divergence, and Laplacians. Buoyancy couples temperature to radial motion; compressional work couples convergence back to temperature. Viscosity, thermal diffusion, drag, density relaxation, radiative relaxation, and weak mean-state corrections close the under-resolved model and control drift.
+Semi-Lagrangian backtracing performs advection. Centered finite differences approximate gradients, divergence, and Laplacians with the longitude metric factor $1/\cos\phi$ and the spherical scalar-Laplacian term $-\tan\phi\,\partial_\phi$. Reported global diagnostics are weighted by surface area through $\cos\phi$. Buoyancy couples temperature to radial motion; compressional work couples convergence back to temperature. Viscosity, thermal diffusion, drag, density relaxation, radiative relaxation, and weak mean-state corrections close the under-resolved model and control drift. I do not impose rigid rotation: large convective cells can mimic a velocity dipole, and the latest resolved ALMA analysis reports no clear rotational signature \cite{ma2024,dent2026}.
 
 The interface reports mean and RMS temperature, RMS velocity, sound speed, Mach number, density contrast, and normalized convective correlation
 \begin{equation}
 C_{wT}=\frac{\langle w'T'\rangle}
 {\sqrt{\langle w'^2\rangle\langle T'^2\rangle}}.
 \end{equation}
-At the fixed regression seed, a 240-step run produces $T=2376.3$ K, $v_{\rm rms}=3.690$ km s$^{-1}$, $\mathcal{M}=0.736$, and density contrast 1.5838. These values demonstrate numerical evolution and bounded diagnostics, not a calibrated three-dimensional radiation-hydrodynamic solution.
+One numerical step represents 0.25 accelerated surface day and is deliberately independent of the received-year scenario slider. At the fixed regression seed, a 240-step run (60 surface days) produces $T=3747.0$ K, $v_{\rm rms}=8.148$ km s$^{-1}$, $\mathcal{M}=1.294$, and density contrast 1.6002. This disk-scale RMS flow is below the approximately 20 km s$^{-1}$ local upflow/downflow scale inferred from spectropolarimetry, whose characteristic convective-cell size is approximately $0.6R_\star$ \cite{lopezariste2018}. These regression values demonstrate numerical evolution and bounded diagnostics, not a calibrated three-dimensional radiation-hydrodynamic solution.
 
 Important omitted physics includes deep radial stratification, self-consistent gravity, ionization, magnetic fields, shock capturing in the surface solver, nuclear burning, a wavelength-dependent opacity table, and radiative transfer. The interactive viscosity and diffusivity are closure parameters, not measured material coefficients.
+
+For an imposed explosion branch, the forward shock expands freely for the first ten years and then follows $R_{\rm sh}\propto t^{0.875}$, a representative self-similar deceleration in a wind-like circumstellar medium. This is more physical than constant-speed expansion over five centuries, but it remains a scenario visualization rather than a Betelgeuse-specific explosion forecast.
 
 \section{Software architecture}
 
@@ -528,6 +530,15 @@ L. D. Matthews et al., ``The radio atmosphere of Betelgeuse,'' 2026, arXiv:2608.
 
 \bibitem{joyce2020}
 M. Joyce et al., ``Standing on the shoulders of giants: new mass and distance estimates for Betelgeuse through combined evolutionary, asteroseismic, and hydrodynamic simulations,'' \emph{The Astrophysical Journal}, 902, 63, 2020. \url{https://arxiv.org/abs/2006.09837}
+
+\bibitem{ohnaka2011}
+K. Ohnaka et al., ``Imaging the dynamical atmosphere of the red supergiant Betelgeuse in the CO first overtone lines with VLTI/AMBER,'' \emph{Astronomy \& Astrophysics}, 529, A163, 2011. \url{https://arxiv.org/abs/1104.0958}
+
+\bibitem{lopezariste2018}
+A. L\'opez Ariste et al., ``Convective cells in Betelgeuse: imaging through spectropolarimetry,'' \emph{Astronomy \& Astrophysics}, 620, A199, 2018. \url{https://doi.org/10.1051/0004-6361/201834178}
+
+\bibitem{ma2024}
+J. Z. Ma et al., ``ALMA observations of Betelgeuse: large-scale convection and possible rotation,'' 2024, arXiv:2311.16885. \url{https://arxiv.org/abs/2311.16885}
 
 \bibitem{saio2023}
 H. Saio et al., ``The evolutionary stage of Betelgeuse inferred from its pulsation periods,'' 2023, arXiv:2306.00287. \url{https://arxiv.org/abs/2306.00287}

@@ -6,17 +6,30 @@ The interactive renderer is a conditional visual forward model spanning 2026–2
 
 The default branch follows the project's preferred interpretation: no collapse is inserted into the next 500 years. The disputed branch permits an imposed Earth-arrival epoch from 2056–2326 CE, corresponding to the published several-dozen-to-several-hundred-year model-family range. The selectable epoch is not a posterior sample, confidence interval, or event probability.
 
-## Measured anchor
+## Observational anchors
 
-The model uses the 2023 ALMA Band 7 angular diameter and the adopted distance as a physical scale:
+The renderer now separates two emitting surfaces that must not be treated as the same physical layer.
+
+The default near-infrared continuum view uses the limb-darkened diameter and temperature reported by Ohnaka et al. (2011):
 
 ```text
-theta = 57.74 mas
+theta_NIR = 42.49 +/- 0.06 mas
+T_NIR = 3690 +/- 54 K
 D = 172 pc
-R_star = theta D / 2 = approximately 4.97 AU
+R_NIR = theta_NIR D / 2 = approximately 3.65 AU = 786 R_sun
 ```
 
-The rendered temperature pattern is a procedural qualitative representation of red-supergiant convection and limb darkening. A single resolved 2D brightness map cannot determine a unique 3D temperature, density, or velocity field.
+This scale is consistent with the independent 3600 +/- 25 K optical spectrophotometric estimate during the Great Dimming and the 764 (+116/-62) R_sun seismic/evolutionary radius. A representative present-day mass of 17.5 M_sun is the midpoint of the Joyce et al. (2020) 16.5-19 M_sun range. It gives the displayed derived values
+
+```text
+log10(g / [cm s^-2]) = -0.11
+v_escape = sqrt(2GM/R) = approximately 92 km s^-1
+L_SB = 4 pi R^2 sigma T_eff^4 = approximately 1.03e5 L_sun.
+```
+
+The alternate ALMA Band 7 view uses `theta = 57.74 mas` and `T_b approximately 2300 K`. Dent et al. (2026) describe the optically thick sub-mm photosphere as approximately 1.1-1.3 times the stellar radius, with an approximately 800 K hot enhancement, radius deviations up to +/-6%, and weaker continuum and molecular emission extending to approximately 2.5 stellar radii. The view is explicitly false-colour because a 338 GHz brightness-temperature map is not a naked-eye image.
+
+The rendered temperature pattern is a reduced qualitative representation of red-supergiant convection and limb darkening. A single resolved two-dimensional brightness map cannot determine a unique three-dimensional temperature, density, or velocity field. The two projected ALMA hot regions are placed approximately on the visible hemisphere; their line-of-sight depths are not measured.
 
 ## Reduced hydrodynamic surface layer
 
@@ -37,9 +50,13 @@ p = rho k_B T / (mu m_H)
 c_s = sqrt(gamma p / rho)
 ```
 
-Semi-Lagrangian backtracing provides stable advection. Centred finite differences provide pressure gradients, divergence, and Laplacians. Buoyancy couples temperature to radial velocity; compressional work couples divergence back to temperature. Viscosity, thermal diffusion, drag, density relaxation, radiative relaxation, and weak mean-state corrections close the under-resolved system and prevent numerical drift. The displayed temperature, RMS velocity, sound speed, Mach number, density contrast, and normalized convective correlation are calculated from the evolving grid.
+Semi-Lagrangian backtracing provides stable advection. Centred finite differences include longitude metric factors and the latitude term of the spherical Laplacian. Area-weighted diagnostics prevent the polar grid rows from being over-counted. Buoyancy couples temperature to radial velocity; compressional work couples divergence back to temperature. Viscosity, thermal diffusion, drag, density relaxation, radiative relaxation, and weak mean-state corrections close the under-resolved system and prevent numerical drift.
 
-The renderer uploads the solved grid as a GPU texture. Temperature controls colour, radial velocity and density perturb the surface radius, and flow magnitude changes fine structure. Smaller procedural terms prevent visible grid imprinting but no longer determine the large cells.
+The worker is scaled around 3690 K and maps one velocity unit to 10 km/s. A fixed-seed 240-step regression produces a mean temperature of approximately 3750 K, an RMS velocity of approximately 8 km/s, Mach approximately 1.3, and a density contrast of approximately 1.6. These are bounded numerical diagnostics rather than fitted observations. Local spectropolarimetric convection velocities can reach approximately 20 km/s and inferred cells have a characteristic size near 0.6 stellar radius (Lopez Ariste et al. 2018). One numerical step is labelled as 0.25 accelerated surface day so the interface does not imply that visible gas evolution occurs in real browser seconds.
+
+No rigid stellar rotation is imposed. Kervella et al. (2018) inferred a projected rotation signal, but Ma et al. (2024) showed that large-scale convection can mimic such a dipole and Dent et al. (2026) report no clear rotation signature in the newer extended line data.
+
+The renderer uploads the solved grid as a GPU texture. Temperature controls a Planck-ratio-informed near-infrared colour or the labelled radio false-colour scale. Radial velocity and density perturb the surface radius, but the displacement is capped within the observed percent-level asymmetry instead of producing a strongly corrugated sphere. The near-infrared intensity uses the measured power-law limb-darkening exponent of 0.097. Smaller procedural terms prevent visible grid imprinting but no longer determine the large cells.
 
 This is a physically explicit reduced model, not a radiation-hydrodynamic solution. It does not solve the transfer equation,
 
@@ -51,20 +68,21 @@ and therefore does not predict calibrated intensity, line profiles, or wavelengt
 
 ## Conditional explosion branch
 
-The imposed-collapse branch visually compresses core collapse, a roughly 19-hour envelope shock-crossing scale, breakout, expansion, and remnant development. The large-scale ejecta readout uses
+The imposed-collapse branch visually compresses core collapse, a roughly 15-hour envelope shock-crossing scale for the near-infrared radius and a representative 10,000 km/s shock, breakout, expansion, and remnant development. The large-scale forward-shock readout uses a deliberately simple two-regime law:
 
 ```text
-R_ej(t) = v_ej (t - t_0)
-v_ej = 5,000 km s^-1
+R_sh(t) = v_ej t                         for t <= 10 yr
+R_sh(t) = R_sh(10 yr) (t/10 yr)^0.875   for t > 10 yr
+v_ej = 5,000 km s^-1.
 ```
 
-At 100 years this undecelerated scale is approximately 0.511 pc in radius. At 172 pc its small-angle diameter is approximately 20.4 arcmin:
+The exponent 0.875 is a representative ejecta-dominated interaction with a wind-like `rho proportional to r^-2` circumstellar profile; it prevents centuries of constant-velocity expansion from being presented as realistic. At 172 pc the small-angle diameter is
 
 ```text
 theta_shell = 2 R_ej / D.
 ```
 
-This scale deliberately omits hydrodynamic deceleration, the circumstellar density profile, radiative cooling, wavelength-dependent emissivity, nucleosynthesis, reverse shocks, dust destruction, magnetic fields, and three-dimensional asymmetry. The visual expansion is logarithmically compressed so centuries of motion remain inside one camera frame; the numerical readout retains the linear ballistic calculation.
+This scale still omits a fitted ejecta energy and mass, a measured circumstellar density normalization, radiative cooling, wavelength-dependent emissivity, nucleosynthesis, reverse shocks, dust destruction, magnetic fields, and three-dimensional asymmetry. The visual expansion is logarithmically compressed so centuries of motion remain inside one camera frame; the numerical readout retains the stated broken power law.
 
 ## GPU implementation
 
@@ -76,6 +94,15 @@ This scale deliberately omits hydrodynamic deceleration, the circumstellar densi
 - Additive shell, particle, and bloom passes encode breakout and optically thin ejecta.
 - Pointer orbit and zoom are optional; all scientific scenario and timeline controls remain keyboard accessible.
 - Reduced-motion systems receive a static surface state and no automatic camera rotation.
+
+## Primary sources used for the physical anchors
+
+- [Ohnaka et al. (2011), near-IR diameter, limb darkening, temperature, and atmospheric velocities](https://arxiv.org/abs/1104.0958)
+- [Levesque & Massey (2020), optical effective temperature during the Great Dimming](https://arxiv.org/abs/2002.10463)
+- [Joyce et al. (2020), mass and radius ranges](https://arxiv.org/abs/2006.09837)
+- [Lopez Ariste et al. (2018), inferred convection-cell scale and velocities](https://doi.org/10.1051/0004-6361/201834178)
+- [Ma et al. (2024), convection as a false rotation signal](https://arxiv.org/abs/2311.16885)
+- [Dent et al. (2026), sub-mm layer temperature, size, hotspots, asymmetry, and outer emission](https://arxiv.org/abs/2608.19339)
 
 ## Interpretation boundary
 

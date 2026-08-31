@@ -20,13 +20,14 @@ globalThis.self = {
       stats.mach,
       stats.densityContrast,
       stats.convectiveFlux,
+      stats.physicalTimeDays,
     ].every(Number.isFinite);
     if (!finiteStats)
       fail('Hydrodynamic worker emitted non-finite diagnostics.');
-    if (stats.meanTemperature < 1700 || stats.meanTemperature > 2900) {
+    if (stats.meanTemperature < 3300 || stats.meanTemperature > 4200) {
       fail(`Mean temperature left the guarded range: ${stats.meanTemperature}`);
     }
-    if (stats.densityContrast < 1 || stats.densityContrast > 2) {
+    if (stats.densityContrast < 1 || stats.densityContrast > 2.2) {
       fail(`Density contrast left the guarded range: ${stats.densityContrast}`);
     }
     const firstTemperature = pixels[0];
@@ -45,7 +46,8 @@ globalThis.self = {
         `T=${stats.meanTemperature.toFixed(1)} K, ` +
         `v_rms=${stats.velocityRms.toFixed(3)} km/s, ` +
         `Mach=${stats.mach.toFixed(3)}, ` +
-        `rho contrast=${stats.densityContrast.toFixed(4)}`,
+        `rho contrast=${stats.densityContrast.toFixed(4)}, ` +
+        `surface time=${stats.physicalTimeDays.toFixed(1)} d`,
     );
     process.exit(0);
   },

@@ -11,7 +11,10 @@ const GAMMA = 5 / 3;
 const BOLTZMANN = 1.380649e-23;
 const HYDROGEN_MASS = 1.6735575e-27;
 const MEAN_MOLECULAR_WEIGHT = 1.3;
-const VELOCITY_SCALE_KM_S = 5.0;
+const PHOTOSPHERE_TEMPERATURE_K = 3690;
+const TEMPERATURE_PERTURBATION_K = 480;
+const VELOCITY_SCALE_KM_S = 10.0;
+const PHYSICAL_DAYS_PER_STEP = 0.25;
 
 let nx = 128;
 let ny = 64;
@@ -104,15 +107,17 @@ function bilinear(field, x, y) {
   );
 }
 
-function laplacian(field, x, y) {
+function sphericalLaplacian(field, x, y, latitude) {
   const centre = field[index(x, y)];
-  return (
-    field[index(x - 1, y)] +
-    field[index(x + 1, y)] +
-    field[index(x, y - 1)] +
-    field[index(x, y + 1)] -
-    4 * centre
-  );
+  const cosine = Math.max(0.42, Math.cos(latitude));
+  const longitudeSecond =
+    (field[index(x - 1, y)] - 2 * centre + field[index(x + 1, y)]) /
+    (cosine * cosine);
+  const latitudeSecond =
+    field[index(x, y - 1)] - 2 * centre + field[index(x, y + 1)];
+  const latitudeFirst = (field[index(x, y + 1)] - field[index(x, y - 1)]) * 0.5;
+  const metricTerm = -clamp(Math.tan(latitude), -2, 2) * latitudeFirst;
+  return longitudeSecond + latitudeSecond + metricTerm;
 }
 
 function clamp(value, low, high) {
@@ -138,8 +143,7 @@ function integrate() {
 
   for (let y = 0; y < ny; y += 1) {
     const latitude = ((y + 0.5) / ny - 0.5) * Math.PI;
-    const coriolis = 0.035 * Math.sin(latitude);
-    const metric = Math.max(0.3, Math.cos(latitude));
+    const metric = Math.max(0.42, Math.cos(latitude));
     for (let x = 0; x < nx; x += 1) {
       const i = index(x, y);
       const u = velocityX[i];
@@ -161,15 +165,17 @@ function integrate() {
         density[index(x, y - 1)] * (1 + 0.22 * theta[index(x, y - 1)]);
       const pressureUp =
         density[index(x, y + 1)] * (1 + 0.22 * theta[index(x, y + 1)]);
-      const pressureGradientX = (pressureRight - pressureLeft) * 0.5;
+      const pressureGradientX = ((pressureRight - pressureLeft) * 0.5) / metric;
       const pressureGradientY = (pressureUp - pressureDown) * 0.5;
       const temperatureGradientX =
-        (theta[index(x + 1, y)] - theta[index(x - 1, y)]) * 0.5;
+        ((theta[index(x + 1, y)] - theta[index(x - 1, y)]) * 0.5) / metric;
       const temperatureGradientY =
         (theta[index(x, y + 1)] - theta[index(x, y - 1)]) * 0.5;
       const divergence =
-        (velocityX[index(x + 1, y)] - velocityX[index(x - 1, y)]) * 0.5 +
-        (velocityY[index(x, y + 1)] - velocityY[index(x, y - 1)]) * 0.5;
+        ((velocityX[index(x + 1, y)] - velocityX[index(x - 1, y)]) * 0.5) /
+          metric +
+        (velocityY[index(x, y + 1)] - velocityY[index(x, y - 1)]) * 0.5 -
+        clamp(Math.tan(latitude), -2, 2) * velocityY[i];
 
       const thermalForcing =
         0.018 *
@@ -184,9 +190,9 @@ function integrate() {
             ((-pressureStrength * pressureGradientX) /
               Math.max(advectedDensity, 0.65) -
               horizontalThermalExpansion * temperatureGradientX +
-              coriolis * advectedV -
               drag * advectedU +
-              parameters.viscosity * laplacian(velocityX, x, y)),
+              parameters.viscosity *
+                sphericalLaplacian(velocityX, x, y, latitude)),
         -0.9,
         0.9,
       );
@@ -196,9 +202,9 @@ function integrate() {
             ((-pressureStrength * pressureGradientY) /
               Math.max(advectedDensity, 0.65) -
               horizontalThermalExpansion * temperatureGradientY -
-              coriolis * advectedU -
               drag * advectedV +
-              parameters.viscosity * laplacian(velocityY, x, y)),
+              parameters.viscosity *
+                sphericalLaplacian(velocityY, x, y, latitude)),
         -0.9,
         0.9,
       );
@@ -208,7 +214,8 @@ function integrate() {
             (buoyancyStrength * parameters.driving * advectedTheta -
               radialDrag * advectedW -
               0.28 * meanRadialVelocity +
-              parameters.viscosity * laplacian(velocityR, x, y)),
+              parameters.viscosity *
+                sphericalLaplacian(velocityR, x, y, latitude)),
         -0.95,
         0.95,
       );
@@ -220,7 +227,8 @@ function integrate() {
               (GAMMA - 1) * (1 + 0.22 * advectedTheta) * divergence -
               parameters.cooling * advectedTheta -
               0.22 * meanTheta +
-              parameters.diffusivity * laplacian(theta, x, y) +
+              parameters.diffusivity *
+                sphericalLaplacian(theta, x, y, latitude) +
               thermalForcing),
         -0.95,
         0.95,
@@ -231,7 +239,9 @@ function integrate() {
             (-compressibility * advectedDensity * divergence -
               0.032 * advectedW +
               0.018 * (1 - advectedDensity) +
-              parameters.diffusivity * 0.35 * laplacian(density, x, y)),
+              parameters.diffusivity *
+                0.35 *
+                sphericalLaplacian(density, x, y, latitude)),
         0.72,
         1.28,
       );
@@ -255,35 +265,47 @@ function publish() {
   let minDensity = Infinity;
   let maxDensity = -Infinity;
   let convectiveFlux = 0;
+  let totalWeight = 0;
 
-  for (let i = 0; i < cellCount; i += 1) {
-    const temperatureK = 2300 + theta[i] * 520;
-    const speedSquared =
-      velocityX[i] * velocityX[i] +
-      velocityY[i] * velocityY[i] +
-      velocityR[i] * velocityR[i];
-    const speed = Math.sqrt(speedSquared);
-    sumTemperature += temperatureK;
-    sumTemperatureSquared += temperatureK * temperatureK;
-    sumSpeedSquared += speedSquared;
-    minDensity = Math.min(minDensity, density[i]);
-    maxDensity = Math.max(maxDensity, density[i]);
-    convectiveFlux += velocityR[i] * theta[i];
-    pixels[i * 4] = Math.round(clamp(0.5 + theta[i] * 0.48, 0, 1) * 255);
-    pixels[i * 4 + 1] = Math.round(clamp(0.5 + velocityR[i] * 0.5, 0, 1) * 255);
-    pixels[i * 4 + 2] = Math.round(clamp((density[i] - 0.7) / 0.6, 0, 1) * 255);
-    pixels[i * 4 + 3] = Math.round(clamp(speed / 0.95, 0, 1) * 255);
+  for (let y = 0; y < ny; y += 1) {
+    const latitude = ((y + 0.5) / ny - 0.5) * Math.PI;
+    const areaWeight = Math.max(0, Math.cos(latitude));
+    for (let x = 0; x < nx; x += 1) {
+      const i = index(x, y);
+      const temperatureK =
+        PHOTOSPHERE_TEMPERATURE_K + theta[i] * TEMPERATURE_PERTURBATION_K;
+      const speedSquared =
+        velocityX[i] * velocityX[i] +
+        velocityY[i] * velocityY[i] +
+        velocityR[i] * velocityR[i];
+      const speed = Math.sqrt(speedSquared);
+      totalWeight += areaWeight;
+      sumTemperature += temperatureK * areaWeight;
+      sumTemperatureSquared += temperatureK * temperatureK * areaWeight;
+      sumSpeedSquared += speedSquared * areaWeight;
+      minDensity = Math.min(minDensity, density[i]);
+      maxDensity = Math.max(maxDensity, density[i]);
+      convectiveFlux += velocityR[i] * theta[i] * areaWeight;
+      pixels[i * 4] = Math.round(clamp(0.5 + theta[i] * 0.48, 0, 1) * 255);
+      pixels[i * 4 + 1] = Math.round(
+        clamp(0.5 + velocityR[i] * 0.5, 0, 1) * 255,
+      );
+      pixels[i * 4 + 2] = Math.round(
+        clamp((density[i] - 0.7) / 0.6, 0, 1) * 255,
+      );
+      pixels[i * 4 + 3] = Math.round(clamp(speed / 0.95, 0, 1) * 255);
+    }
   }
 
-  const meanTemperature = sumTemperature / cellCount;
+  const meanTemperature = sumTemperature / totalWeight;
   const temperatureRms = Math.sqrt(
     Math.max(
       0,
-      sumTemperatureSquared / cellCount - meanTemperature * meanTemperature,
+      sumTemperatureSquared / totalWeight - meanTemperature * meanTemperature,
     ),
   );
   const velocityRms =
-    Math.sqrt(sumSpeedSquared / cellCount) * VELOCITY_SCALE_KM_S;
+    Math.sqrt(sumSpeedSquared / totalWeight) * VELOCITY_SCALE_KM_S;
   const soundSpeed =
     Math.sqrt(
       (GAMMA * BOLTZMANN * meanTemperature) /
@@ -303,8 +325,9 @@ function publish() {
         soundSpeed,
         mach: velocityRms / soundSpeed,
         densityContrast: maxDensity / minDensity,
-        convectiveFlux: convectiveFlux / cellCount,
+        convectiveFlux: convectiveFlux / totalWeight,
         simulationTime,
+        physicalTimeDays: stepCount * PHYSICAL_DAYS_PER_STEP,
         stepCount,
       },
     },

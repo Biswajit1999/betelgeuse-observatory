@@ -69,7 +69,7 @@ The complete first-person scientific and engineering write-up is available as [L
 - An interactive in-band continuum forecast with standardized residuals and explicit incomplete-uncertainty warning.
 - A local blink comparator for up to 5,000 registered image frames; rendered images remain in the browser and are not treated as calibrated FITS measurements.
 - A downloadable three-frame ALMA Bands 6/7/8 visual test bundle, with source, licence, and quantitative-use limitations included alongside the files.
-- A GPU-accelerated 3D timeline from 2026–2526 CE driven by a reduced gas-flow solver for temperature, density, horizontal/radial velocity, buoyancy, pressure response, viscosity, thermal diffusion, compressional heating, and radiative relaxation.
+- A GPU-accelerated 3D timeline from 2026–2526 CE with switchable measured layers: the 42.49 mas, 3690 K near-infrared photosphere and the larger 57.74 mas, approximately 2300 K ALMA Band 7 atmosphere. Its reduced spherical gas-flow solver evolves temperature, density, horizontal/radial velocity, buoyancy, pressure response, viscosity, thermal diffusion, compressional heating, and radiative relaxation without imposing an observationally ambiguous rigid rotation.
 - A provenance manifest for ALMA 2015/2023, ESO SPHERE 2024, AAVSO, and MAST/HST.
 - An evidence language that visibly separates measured, calculated, simulated, model-dependent, and speculative material.
 - A baseline-first statistical-inference structure that forbids an unsupported `exploded/not exploded` classification.
@@ -271,7 +271,10 @@ foundation, but it deliberately leaves the following questions open:
 - Distance, radius, initial/current mass, internal rotation, mixing, and
   mass-loss history remain correlated sources of model uncertainty.
 - The reduced hydrodynamic visualisation is an explanatory model, not a
-  radiation-hydrodynamic forecast of a unique future surface.
+  radiation-hydrodynamic forecast of a unique future surface. Its measured
+  angular scales and temperature anchors constrain the rendering, while hotspot
+  placement, unresolved closure terms, and the conditional explosion morphology
+  remain illustrative.
 - Archive-dependent conclusions require independently retrieved products,
   recorded checksums, a documented CASA or spectral reduction, uncertainty
   propagation, and held-out validation before publication.

@@ -12,6 +12,7 @@ import { siteAsset } from '@/lib/site-path';
 
 type Scenario = 'preferred' | 'conditional';
 type Quality = 'high' | 'efficient';
+type ObservationLayer = 'near-ir' | 'alma-band7';
 
 type HydroParameters = {
   viscosity: number;
@@ -29,6 +30,7 @@ type HydroStats = {
   densityContrast: number;
   convectiveFlux: number;
   simulationTime: number;
+  physicalTimeDays: number;
   stepCount: number;
 };
 
@@ -36,9 +38,31 @@ const START_YEAR = 2026;
 const END_YEAR = 2526;
 const DEFAULT_COLLAPSE_YEAR = 2176;
 const DISTANCE_PC = 172;
+const STELLAR_MASS_SOLAR = 17.5;
+const NEAR_IR_DIAMETER_MAS = 42.49;
+const NEAR_IR_TEMPERATURE_K = 3690;
 const ALMA_DIAMETER_MAS = 57.74;
-const BASE_RADIUS_AU = (ALMA_DIAMETER_MAS / 1000) * DISTANCE_PC * 0.5;
+const ALMA_TEMPERATURE_K = 2300;
+const ALMA_HOTSPOT_ENHANCEMENT_K = 800;
+const NEAR_IR_RADIUS_AU = (NEAR_IR_DIAMETER_MAS / 1000) * DISTANCE_PC * 0.5;
+const ALMA_RADIUS_AU = (ALMA_DIAMETER_MAS / 1000) * DISTANCE_PC * 0.5;
+const ALMA_TO_NEAR_IR_RADIUS = ALMA_DIAMETER_MAS / NEAR_IR_DIAMETER_MAS;
+const SOLAR_RADIUS_AU = 0.00465047;
+const NEAR_IR_RADIUS_SOLAR = NEAR_IR_RADIUS_AU / SOLAR_RADIUS_AU;
+const SURFACE_GRAVITY_MS2 =
+  (6.6743e-11 * STELLAR_MASS_SOLAR * 1.98847e30) /
+  (NEAR_IR_RADIUS_AU * 1.495978707e11) ** 2;
+const LOG_G_CGS = Math.log10(SURFACE_GRAVITY_MS2 * 100);
+const ESCAPE_VELOCITY_KM_S =
+  Math.sqrt(
+    (2 * 6.6743e-11 * STELLAR_MASS_SOLAR * 1.98847e30) /
+      (NEAR_IR_RADIUS_AU * 1.495978707e11),
+  ) / 1000;
+const STEFAN_BOLTZMANN_LUMINOSITY_SOLAR =
+  NEAR_IR_RADIUS_SOLAR ** 2 * (NEAR_IR_TEMPERATURE_K / 5772) ** 4;
 const EJECTA_VELOCITY_KM_S = 5000;
+const EJECTA_WIND_TRANSITION_YEARS = 10;
+const EJECTA_EXPANSION_INDEX = 0.875;
 const PC_IN_KM = 3.085677581e13;
 const SECONDS_PER_YEAR = 31_557_600;
 const DEFAULT_HYDRO_PARAMETERS: HydroParameters = {
@@ -48,23 +72,26 @@ const DEFAULT_HYDRO_PARAMETERS: HydroParameters = {
   driving: 0.62,
 };
 const DEFAULT_HYDRO_STATS: HydroStats = {
-  meanTemperature: 2300,
+  meanTemperature: NEAR_IR_TEMPERATURE_K,
   temperatureRms: 0,
   velocityRms: 0,
-  soundSpeed: 4.94,
+  soundSpeed: 6.25,
   mach: 0,
   densityContrast: 1,
   convectiveFlux: 0,
   simulationTime: 0,
+  physicalTimeDays: 0,
   stepCount: 0,
 };
 
 const vertexShader = `
   uniform float uTime;
   uniform float uActivity;
+  uniform float uRadialScale;
   uniform sampler2D uHydroMap;
   varying vec3 vNormalWorld;
   varying vec3 vPosition;
+  varying vec3 vObjectDirection;
   varying float vNoise;
   varying vec4 vHydro;
 
@@ -104,56 +131,96 @@ const vertexShader = `
     float densityPerturbation = hydro.b * 2.0 - 1.0;
     float broad = fbm(direction * 2.25 + vec3(uTime * 0.018, -uTime * 0.012, 0.0));
     float detail = fbm(direction * 7.0 - vec3(0.0, uTime * 0.028, uTime * 0.014));
-    float displacement = (broad - 0.48) * 0.18 + (detail - 0.5) * 0.055;
-    displacement += radialVelocity * 0.115 - densityPerturbation * 0.035;
-    displacement *= 0.78 + uActivity * 0.55;
+    float displacement = (broad - 0.48) * 0.026 + (detail - 0.5) * 0.009;
+    displacement += radialVelocity * 0.072 - densityPerturbation * 0.018;
+    displacement *= uRadialScale * (0.9 + uActivity * 0.12);
+    displacement = clamp(displacement, -0.11, 0.11);
     vec3 displaced = position + normal * displacement;
-    vNoise = broad * 0.72 + detail * 0.28;
+    vec4 worldPosition = modelMatrix * vec4(displaced, 1.0);
+    vNoise = broad * 0.88 + detail * 0.12;
     vHydro = hydro;
-    vPosition = displaced;
-    vNormalWorld = normalize(normalMatrix * normal);
-    gl_Position = projectionMatrix * modelViewMatrix * vec4(displaced, 1.0);
+    vObjectDirection = direction;
+    vPosition = worldPosition.xyz;
+    vNormalWorld = normalize(mat3(modelMatrix) * normal);
+    gl_Position = projectionMatrix * viewMatrix * worldPosition;
   }
 `;
 
 const fragmentShader = `
-  uniform float uTime;
   uniform float uActivity;
   uniform float uOpacity;
+  uniform float uLayerMode;
+  uniform float uTemperatureBase;
+  uniform float uTemperatureSpan;
+  uniform float uHotspotEnhancement;
+  uniform float uLimbExponent;
   varying vec3 vNormalWorld;
   varying vec3 vPosition;
+  varying vec3 vObjectDirection;
   varying float vNoise;
   varying vec4 vHydro;
 
-  float hash(vec3 p) {
-    p = fract(p * 0.3183099 + 0.1);
-    p *= 17.0;
-    return fract(p.x * p.y * p.z * (p.x + p.y + p.z));
+  float planckRatio(float wavelengthNm, float temperatureK) {
+    float referenceNm = 700.0;
+    float c2NmK = 1.4387769e7;
+    float xReference = c2NmK / (referenceNm * temperatureK);
+    float x = c2NmK / (wavelengthNm * temperatureK);
+    return pow(referenceNm / wavelengthNm, 5.0) *
+      (exp(xReference) - 1.0) / (exp(x) - 1.0);
+  }
+
+  vec3 continuumColour(float temperatureK) {
+    return vec3(
+      1.0,
+      planckRatio(546.0, temperatureK) * 0.72,
+      planckRatio(435.0, temperatureK) * 0.42
+    );
+  }
+
+  vec3 radioFalseColour(float normalizedTemperature) {
+    vec3 low = vec3(0.12, 0.006, 0.002);
+    vec3 middle = vec3(0.82, 0.085, 0.008);
+    vec3 high = vec3(1.0, 0.63, 0.12);
+    float split = smoothstep(0.0, 0.62, normalizedTemperature);
+    vec3 lower = mix(low, middle, split);
+    return mix(lower, high, smoothstep(0.58, 1.0, normalizedTemperature));
   }
 
   void main() {
     vec3 viewDirection = normalize(cameraPosition - vPosition);
     float facing = max(dot(normalize(vNormalWorld), viewDirection), 0.0);
-    float limb = pow(facing, 0.52);
-    float simulatedTemperature = vHydro.r;
-    float upflow = vHydro.g;
+    float limb = pow(max(facing, 0.0001), uLimbExponent);
+    float temperaturePerturbation = vHydro.r * 2.0 - 1.0;
+    float upflow = vHydro.g * 2.0 - 1.0;
     float flowSpeed = vHydro.a;
-    float thermalStructure = mix(vNoise, simulatedTemperature, 0.78);
-    float cellular = smoothstep(0.24, 0.78, thermalStructure);
-    float hotCell = smoothstep(0.63, 0.88, simulatedTemperature + 0.08 * upflow);
-    float grain = hash(floor(vPosition * 85.0));
+    float hydroStructure = temperaturePerturbation * 0.88 + (vNoise - 0.5) * 0.24;
 
-    vec3 darkRed = vec3(0.20, 0.006, 0.001);
-    vec3 redOrange = vec3(1.0, 0.115, 0.006);
-    vec3 amber = vec3(1.0, 0.48, 0.035);
-    vec3 cream = vec3(1.0, 0.87, 0.56);
-    vec3 colour = mix(darkRed, redOrange, cellular);
-    colour = mix(colour, amber, hotCell * (0.55 + 0.35 * uActivity));
-    colour = mix(colour, cream, pow(hotCell, 4.0) * 0.62);
-    colour += vec3(0.18, 0.025, 0.0) * flowSpeed * (0.35 + 0.65 * upflow);
-    colour *= 0.32 + 0.86 * limb;
-    colour += grain * 0.025;
-    colour += vec3(0.22, 0.015, 0.0) * pow(1.0 - facing, 3.0);
+    vec3 northEast = normalize(vec3(-0.42, 0.48, 0.77));
+    vec3 southWest = normalize(vec3(0.42, -0.48, 0.77));
+    float northEastSpot = exp(-18.0 * (1.0 - dot(vObjectDirection, northEast)));
+    float southWestSpot = exp(-24.0 * (1.0 - dot(vObjectDirection, southWest)));
+    float observedHotStructure = 0.78 * northEastSpot + 0.46 * southWestSpot;
+
+    float temperatureK = uTemperatureBase +
+      hydroStructure * uTemperatureSpan * (0.88 + 0.12 * uActivity);
+    if (uLayerMode > 0.5) {
+      temperatureK += observedHotStructure * uHotspotEnhancement;
+    }
+
+    float thermalIntensity = pow(temperatureK / uTemperatureBase, 4.0);
+    vec3 colour = continuumColour(temperatureK);
+    if (uLayerMode > 0.5) {
+      float normalizedRadioTemperature = clamp((temperatureK - 1700.0) / 1500.0, 0.0, 1.0);
+      colour = radioFalseColour(normalizedRadioTemperature);
+    }
+
+    // Preserve chromatic and cell contrast instead of clipping the hotter
+    // near-infrared continuum to a featureless white display surface.
+    colour *= mix(0.54, 1.0, uLayerMode);
+
+    float laneSuppression = 1.0 - 0.16 * flowSpeed * (0.5 - 0.5 * upflow);
+    colour *= thermalIntensity * laneSuppression * (0.28 + 0.72 * limb);
+    colour += vec3(0.05, 0.008, 0.001) * pow(1.0 - facing, 2.5);
 
     gl_FragColor = vec4(colour, uOpacity);
   }
@@ -223,7 +290,18 @@ function createGlowTexture() {
 
 function ejectaRadiusPc(elapsedYears: number) {
   if (elapsedYears <= 0) return 0;
-  return (elapsedYears * SECONDS_PER_YEAR * EJECTA_VELOCITY_KM_S) / PC_IN_KM;
+  const freeExpansionRadiusPc =
+    (Math.min(elapsedYears, EJECTA_WIND_TRANSITION_YEARS) *
+      SECONDS_PER_YEAR *
+      EJECTA_VELOCITY_KM_S) /
+    PC_IN_KM;
+  if (elapsedYears <= EJECTA_WIND_TRANSITION_YEARS) {
+    return freeExpansionRadiusPc;
+  }
+  return (
+    freeExpansionRadiusPc *
+    (elapsedYears / EJECTA_WIND_TRANSITION_YEARS) ** EJECTA_EXPANSION_INDEX
+  );
 }
 
 function timelinePhase(scenario: Scenario, year: number, collapseYear: number) {
@@ -281,9 +359,12 @@ export function Betelgeuse3DTimeline() {
   const workerRef = useRef<Worker | null>(null);
   const hydroParametersRef = useRef<HydroParameters>(DEFAULT_HYDRO_PARAMETERS);
   const scenarioRef = useRef<Scenario>('preferred');
+  const observationLayerRef = useRef<ObservationLayer>('near-ir');
   const yearRef = useRef(START_YEAR);
   const collapseYearRef = useRef(DEFAULT_COLLAPSE_YEAR);
   const [scenario, setScenario] = useState<Scenario>('preferred');
+  const [observationLayer, setObservationLayer] =
+    useState<ObservationLayer>('near-ir');
   const [year, setYear] = useState(START_YEAR);
   const [collapseYear, setCollapseYear] = useState(DEFAULT_COLLAPSE_YEAR);
   const [quality, setQuality] = useState<Quality>('high');
@@ -299,6 +380,10 @@ export function Betelgeuse3DTimeline() {
   useEffect(() => {
     scenarioRef.current = scenario;
   }, [scenario]);
+
+  useEffect(() => {
+    observationLayerRef.current = observationLayer;
+  }, [observationLayer]);
 
   useEffect(() => {
     yearRef.current = year;
@@ -329,11 +414,25 @@ export function Betelgeuse3DTimeline() {
     scenario === 'conditional' ? ejectaRadiusPc(elapsedYears) : 0;
   const angularDiameterArcmin =
     radiusPc > 0 ? ((2 * radiusPc) / DISTANCE_PC) * (180 / Math.PI) * 60 : 0;
+  const displayedLayerTemperature =
+    observationLayer === 'near-ir'
+      ? hydroStats.meanTemperature
+      : ALMA_TEMPERATURE_K;
+  const displayedLayerRadiusAu =
+    observationLayer === 'near-ir' ? NEAR_IR_RADIUS_AU : ALMA_RADIUS_AU;
+  const displayedLayerDiameterMas =
+    observationLayer === 'near-ir' ? NEAR_IR_DIAMETER_MAS : ALMA_DIAMETER_MAS;
+  const cellCrossingYears =
+    hydroStats.velocityRms > 0.05
+      ? (0.6 * NEAR_IR_RADIUS_AU * 1.495978707e8) /
+        (hydroStats.velocityRms * SECONDS_PER_YEAR)
+      : 0;
 
   const reset = useCallback(() => {
     setPlaying(false);
     setYear(START_YEAR);
     setCollapseYear(DEFAULT_COLLAPSE_YEAR);
+    setObservationLayer('near-ir');
     setHydroParameters(DEFAULT_HYDRO_PARAMETERS);
     setHydroRunning(true);
     workerRef.current?.postMessage({ type: 'reset' });
@@ -385,7 +484,7 @@ export function Betelgeuse3DTimeline() {
     );
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.32;
+    renderer.toneMappingExposure = 0.92;
     renderer.setClearColor(0x020203, 1);
     renderer.domElement.className = 'stellar-canvas';
     renderer.domElement.setAttribute('aria-hidden', 'true');
@@ -477,7 +576,13 @@ export function Betelgeuse3DTimeline() {
       uniforms: {
         uTime: { value: 0 },
         uActivity: { value: 0.42 },
+        uRadialScale: { value: 0.62 },
         uOpacity: { value: 1 },
+        uLayerMode: { value: 0 },
+        uTemperatureBase: { value: NEAR_IR_TEMPERATURE_K },
+        uTemperatureSpan: { value: 480 },
+        uHotspotEnhancement: { value: ALMA_HOTSPOT_ENHANCEMENT_K },
+        uLimbExponent: { value: 0.097 },
         uHydroMap: { value: hydroTexture },
       },
       vertexShader,
@@ -489,21 +594,22 @@ export function Betelgeuse3DTimeline() {
     root.add(star);
 
     const atmosphereMaterial = new THREE.MeshBasicMaterial({
-      color: 0xff2f04,
+      color: 0xb83c12,
       transparent: true,
-      opacity: 0.08,
+      opacity: 0.025,
       blending: THREE.AdditiveBlending,
       side: THREE.BackSide,
       depthWrite: false,
     });
     const atmosphere = new THREE.Mesh(
-      new THREE.SphereGeometry(2.18, 96, 64),
+      new THREE.SphereGeometry(2, 96, 64),
       atmosphereMaterial,
     );
+    atmosphere.scale.setScalar(ALMA_TO_NEAR_IR_RADIUS);
     root.add(atmosphere);
 
     const random = seededRandom(194205);
-    const plumeCount = quality === 'high' ? 6200 : 2800;
+    const plumeCount = quality === 'high' ? 4200 : 1800;
     const plumePositions = new Float32Array(plumeCount * 3);
     const plumeColours = new Float32Array(plumeCount * 3);
     const colour = new THREE.Color();
@@ -533,7 +639,7 @@ export function Betelgeuse3DTimeline() {
       size: quality === 'high' ? 0.024 : 0.034,
       sizeAttenuation: true,
       transparent: true,
-      opacity: 0.24,
+      opacity: 0.12,
       vertexColors: true,
       blending: THREE.AdditiveBlending,
       depthWrite: false,
@@ -605,7 +711,7 @@ export function Betelgeuse3DTimeline() {
       map: glowTexture,
       color: 0xff5b0a,
       transparent: true,
-      opacity: 0.72,
+      opacity: 0.32,
       blending: THREE.AdditiveBlending,
       depthWrite: false,
     });
@@ -669,9 +775,9 @@ export function Betelgeuse3DTimeline() {
     composer.addPass(new RenderPass(scene, camera));
     const bloom = new UnrealBloomPass(
       new THREE.Vector2(1, 1),
-      1.18,
+      0.58,
+      0.42,
       0.72,
-      0.18,
     );
     composer.addPass(bloom);
 
@@ -695,6 +801,7 @@ export function Betelgeuse3DTimeline() {
     const animate = () => {
       const time = (performance.now() - animationStart) / 1000;
       const currentScenario = scenarioRef.current;
+      const currentObservationLayer = observationLayerRef.current;
       const currentYear = yearRef.current;
       const eventYear = collapseYearRef.current;
       const currentPhase = timelinePhase(
@@ -705,17 +812,28 @@ export function Betelgeuse3DTimeline() {
       const elapsed = currentPhase.elapsed;
       const exploded = currentScenario === 'conditional' && elapsed >= 0;
       const breakout = exploded && elapsed < 1;
-      const pulsation = reducedMotion ? 1 : 1 + Math.sin(time * 0.85) * 0.018;
+      const layerScale =
+        currentObservationLayer === 'alma-band7' ? ALMA_TO_NEAR_IR_RADIUS : 1;
 
       if (!reducedMotion) {
         starMaterial.uniforms.uTime.value = time;
         shellMaterial.uniforms.uTime.value = time;
-        plumes.rotation.y = time * 0.012;
-        plumes.rotation.x = Math.sin(time * 0.08) * 0.04;
         ejecta.rotation.y = time * 0.018;
         starfield.rotation.y = time * 0.0014;
       }
       starMaterial.uniforms.uActivity.value = currentPhase.activity;
+      starMaterial.uniforms.uLayerMode.value =
+        currentObservationLayer === 'alma-band7' ? 1 : 0;
+      starMaterial.uniforms.uTemperatureBase.value =
+        currentObservationLayer === 'alma-band7'
+          ? ALMA_TEMPERATURE_K
+          : NEAR_IR_TEMPERATURE_K;
+      starMaterial.uniforms.uTemperatureSpan.value =
+        currentObservationLayer === 'alma-band7' ? 360 : 480;
+      starMaterial.uniforms.uLimbExponent.value =
+        currentObservationLayer === 'alma-band7' ? 0.02 : 0.097;
+      starMaterial.uniforms.uRadialScale.value =
+        currentObservationLayer === 'alma-band7' ? 1 : 0.62;
       const starOpacity = exploded
         ? breakout
           ? 1
@@ -723,17 +841,20 @@ export function Betelgeuse3DTimeline() {
         : 1;
       starMaterial.uniforms.uOpacity.value = starOpacity;
       star.scale.setScalar(
-        exploded ? pulsation * Math.max(0.08, 1 - elapsed / 2.2) : pulsation,
+        layerScale * (exploded ? Math.max(0.08, 1 - elapsed / 2.2) : 1),
       );
-      atmosphere.scale
-        .copy(star.scale)
-        .multiplyScalar(1 + currentPhase.activity * 0.035);
+      atmosphere.scale.setScalar(
+        ALMA_TO_NEAR_IR_RADIUS *
+          (exploded ? Math.max(0.08, 1 - elapsed / 2.2) : 1),
+      );
       atmosphereMaterial.opacity = exploded
-        ? Math.max(0, 0.12 - elapsed * 0.1)
-        : 0.055 + currentPhase.activity * 0.07;
+        ? Math.max(0, 0.08 - elapsed * 0.08)
+        : currentObservationLayer === 'alma-band7'
+          ? 0.012
+          : 0.022 + currentPhase.activity * 0.012;
       plumeMaterial.opacity = exploded
-        ? Math.max(0, 0.32 - elapsed * 0.14)
-        : 0.16 + currentPhase.activity * 0.16;
+        ? Math.max(0, 0.18 - elapsed * 0.09)
+        : 0.07 + currentPhase.activity * 0.06;
       plumes.scale.setScalar(exploded ? 1 + Math.min(elapsed, 5) * 0.24 : 1);
 
       shell.visible = exploded;
@@ -754,9 +875,9 @@ export function Betelgeuse3DTimeline() {
           : Math.max(0.11, 0.66 - Math.log1p(elapsed) * 0.09);
         bloom.strength = breakout ? 2.4 : 1.25;
       } else {
-        glow.scale.setScalar(6.1);
-        glowMaterial.opacity = 0.6 + currentPhase.activity * 0.13;
-        bloom.strength = 1.05 + currentPhase.activity * 0.2;
+        glow.scale.setScalar(5.7 * layerScale);
+        glowMaterial.opacity = 0.13 + currentPhase.activity * 0.02;
+        bloom.strength = 0.32 + currentPhase.activity * 0.08;
       }
       remnantMaterial.opacity = exploded ? Math.min(1, elapsed / 8) : 0;
       remnant.scale.setScalar(
@@ -860,21 +981,46 @@ export function Betelgeuse3DTimeline() {
         </button>
       </div>
 
+      <div
+        className="stellar-layer-controls"
+        aria-label="Synthetic observation layer"
+      >
+        <button
+          type="button"
+          aria-pressed={observationLayer === 'near-ir'}
+          onClick={() => setObservationLayer('near-ir')}
+        >
+          <span>Near-IR continuum</span>
+          <strong>42.49 mas · 3690 K</strong>
+        </button>
+        <button
+          type="button"
+          aria-pressed={observationLayer === 'alma-band7'}
+          onClick={() => setObservationLayer('alma-band7')}
+        >
+          <span>ALMA Band 7 layer</span>
+          <strong>57.74 mas · 2300 K</strong>
+        </button>
+      </div>
+
       <figure className="stellar-viewport">
         <figcaption className="sr-only">
           Three-dimensional gas-flow-driven rendering for year{' '}
-          {Math.round(year)}. {phase.label}. Mean atmospheric temperature{' '}
-          {hydroStats.meanTemperature.toFixed(0)} kelvin and root-mean-square
-          gas velocity {hydroStats.velocityRms.toFixed(2)} kilometres per
-          second.
+          {Math.round(year)}. {phase.label}. Synthetic{' '}
+          {observationLayer === 'near-ir'
+            ? 'near-infrared continuum photosphere'
+            : 'ALMA Band 7 brightness-temperature layer'}{' '}
+          with a representative temperature of{' '}
+          {displayedLayerTemperature.toFixed(0)} kelvin and root-mean-square gas
+          velocity {hydroStats.velocityRms.toFixed(2)} kilometres per second.
         </figcaption>
         <div ref={mountRef} className="stellar-canvas-mount" />
         <div className="stellar-viewport-overlay" aria-hidden="true">
           <span>{Math.round(year)} CE</span>
           <strong>{phase.label}</strong>
           <small>
-            Hydrodynamic step {hydroStats.stepCount.toLocaleString()} · drag to
-            orbit · wheel or pinch to zoom
+            Accelerated surface time {hydroStats.physicalTimeDays.toFixed(0)} d
+            · step {hydroStats.stepCount.toLocaleString()} · drag to orbit
           </small>
         </div>
         {webglError ? (
@@ -886,37 +1032,112 @@ export function Betelgeuse3DTimeline() {
 
       <div className="stellar-readouts">
         <div>
-          <span>Thermal state</span>
-          <strong>
-            {hydroStats.meanTemperature.toFixed(0)} ±{' '}
-            {hydroStats.temperatureRms.toFixed(0)} K
-          </strong>
-          <small>Mean ± spatial RMS temperature perturbation</small>
+          <span>Selected emitting layer</span>
+          {observationLayer === 'near-ir' ? (
+            <>
+              <strong>
+                {hydroStats.meanTemperature.toFixed(0)} ±{' '}
+                {hydroStats.temperatureRms.toFixed(0)} K
+              </strong>
+              <small>Simulated mean ± surface RMS around 3690 K</small>
+            </>
+          ) : (
+            <>
+              <strong>≈2300 K · hot patch +≈800 K</strong>
+              <small>Measured Band 7 brightness-temperature anchors</small>
+            </>
+          )}
         </div>
         <div>
-          <span>Gas-flow state</span>
+          <span>Surface-flow state</span>
           <strong>{hydroStats.velocityRms.toFixed(2)} km s⁻¹ RMS</strong>
           <small>
             c<sub>s</sub> = {hydroStats.soundSpeed.toFixed(2)} km s⁻¹ · Mach{' '}
-            {hydroStats.mach.toFixed(2)}
+            {hydroStats.mach.toFixed(2)} · cell crossing ≈{' '}
+            {cellCrossingYears > 0 ? cellCrossingYears.toFixed(2) : '—'} yr
           </small>
         </div>
         <div>
-          <span>Density + convective transport</span>
-          <strong>ρmax/ρmin = {hydroStats.densityContrast.toFixed(3)}</strong>
+          <span>Measured geometric scale</span>
+          <strong>
+            θ = {displayedLayerDiameterMas.toFixed(2)} mas · R ≈{' '}
+            {displayedLayerRadiusAu.toFixed(2)} AU
+          </strong>
           <small>
-            ⟨w′T′⟩ = {hydroStats.convectiveFlux.toExponential(2)} · normalized
+            Near-IR R ≈ {NEAR_IR_RADIUS_SOLAR.toFixed(0)} R<sub>☉</sub> at 172
+            pc
+          </small>
+        </div>
+        <div>
+          <span>Representative gravity scale</span>
+          <strong>
+            log g = {LOG_G_CGS.toFixed(2)} · v<sub>esc</sub> ≈{' '}
+            {ESCAPE_VELOCITY_KM_S.toFixed(0)} km s⁻¹
+          </strong>
+          <small>
+            M = {STELLAR_MASS_SOLAR.toFixed(1)} M<sub>☉</sub> midpoint · L ≈{' '}
+            {(STEFAN_BOLTZMANN_LUMINOSITY_SOLAR / 1000).toFixed(0)} × 10³ L
+            <sub>☉</sub>
           </small>
         </div>
       </div>
 
       {radiusPc > 0 ? (
         <p className="stellar-ejecta-readout">
-          Conditional ejecta: R<sub>ej</sub> = {radiusPc.toFixed(3)} pc ·
+          Conditional forward shock: R<sub>sh</sub> = {radiusPc.toFixed(3)} pc ·
           angular diameter ≈ {angularDiameterArcmin.toFixed(1)} arcmin at 172 pc
-          · {phase.short}
+          · free expansion transitions to R ∝ t
+          <sup>{EJECTA_EXPANSION_INDEX}</sup> after{' '}
+          {EJECTA_WIND_TRANSITION_YEARS} yr · {phase.short}
         </p>
       ) : null}
+
+      <section
+        className="stellar-fact-grid"
+        aria-labelledby="stellar-facts-title"
+      >
+        <h4 id="stellar-facts-title" className="sr-only">
+          Observational anchors used by the simulation
+        </h4>
+        <article>
+          <span className="evidence-tag measured">Continuum surface</span>
+          <strong>42.49 ± 0.06 mas · 3690 ± 54 K</strong>
+          <p>
+            Near-infrared limb-darkened diameter and continuum-forming
+            temperature.{' '}
+            <a href="https://arxiv.org/abs/1104.0958">Ohnaka et al. 2011</a>
+          </p>
+        </article>
+        <article>
+          <span className="evidence-tag measured">Sub-mm atmosphere</span>
+          <strong>≈2300 K · 1.1–1.3 R★</strong>
+          <p>
+            Band 7/8 structure includes an ≈800 K hot enhancement, radius
+            deviations up to ±6%, and weak emission to ≈2.5 R★.{' '}
+            <a href="https://arxiv.org/abs/2608.19339">Dent et al. 2026</a>
+          </p>
+        </article>
+        <article>
+          <span className="evidence-tag model">Flow constraint</span>
+          <strong>Cells ≈0.6 R★ · local flows ≈20 km s⁻¹</strong>
+          <p>
+            The renderer targets a lower disk-integrated RMS; observed local
+            upflows and downflows can be much faster.{' '}
+            <a href="https://doi.org/10.1051/0004-6361/201834178">
+              López Ariste et al. 2018
+            </a>
+          </p>
+        </article>
+        <article>
+          <span className="evidence-tag calculated">Rotation discipline</span>
+          <strong>No rigid rotation imposed</strong>
+          <p>
+            Large convective cells can mimic a velocity dipole, and the 2023
+            ALMA data show no clear rotation signature.{' '}
+            <a href="https://arxiv.org/abs/2311.16885">Ma et al. 2024</a>
+          </p>
+        </article>
+      </section>
 
       <section
         className="stellar-physics-controls"
@@ -1021,8 +1242,9 @@ export function Betelgeuse3DTimeline() {
         </div>
         <p>
           Coefficients are nondimensional surface-layer closures. They alter the
-          solved flow field rather than merely changing colour or animation
-          speed.
+          solved flow field rather than merely changing colour. The worker maps
+          one numerical step to 0.25 accelerated surface day; it is not
+          synchronized to the compressed 500-year evolutionary slider.
         </p>
       </section>
 
@@ -1121,8 +1343,10 @@ export function Betelgeuse3DTimeline() {
             D<strong>v</strong>/Dt = −∇p/ρ + αgT′r̂ + ν∇²<strong>v</strong>
           </p>
           <p>
-            Pressure gradients, buoyancy, drag, Coriolis-like deflection and
-            viscous diffusion evolve the horizontal and radial velocity fields.
+            Spherical pressure gradients, buoyancy, drag and viscous diffusion
+            evolve the horizontal and radial velocity fields. Rotation is not
+            imposed because the current observational interpretation is
+            disputed.
           </p>
         </article>
         <article>
@@ -1134,7 +1358,8 @@ export function Betelgeuse3DTimeline() {
           <p>
             Compression heats, expansion cools, thermal diffusion smooths grid
             scales, buoyant transport sustains cells, and radiative relaxation
-            returns perturbations toward the 2300 K atmospheric anchor.
+            returns perturbations toward the 3690 K near-infrared continuum
+            anchor.
           </p>
         </article>
         <article>
@@ -1142,25 +1367,27 @@ export function Betelgeuse3DTimeline() {
             Equation of state + scale
           </span>
           <p className="equation">
-            p = ρk<sub>B</sub>T/(μm<sub>H</sub>) · c<sub>s</sub> = √(γp/ρ)
+            R = θD/2 · g = GM/R² · L = 4πR²σT<sub>eff</sub>⁴
           </p>
           <p>
-            μ = 1.3 and γ = 5/3 set the displayed sound speed. The geometric
-            anchor remains θ = {ALMA_DIAMETER_MAS.toFixed(2)} mas at 337.99 GHz,
-            corresponding to approximately {BASE_RADIUS_AU.toFixed(2)} AU at 172
-            pc.
+            θ = {NEAR_IR_DIAMETER_MAS.toFixed(2)} mas and D = {DISTANCE_PC} pc
+            give R ≈ {NEAR_IR_RADIUS_AU.toFixed(2)} AU. A representative M ={' '}
+            {STELLAR_MASS_SOLAR.toFixed(1)} M<sub>☉</sub> gives log g ≈{' '}
+            {LOG_G_CGS.toFixed(2)} and v<sub>esc</sub> ≈{' '}
+            {ESCAPE_VELOCITY_KM_S.toFixed(0)} km s⁻¹.
           </p>
         </article>
       </div>
 
       <p className="stellar-boundary-note">
-        The moving temperature and density structures now come from the reduced
-        conservation-law solver. This is materially more physical than animated
-        noise, but it is still not a three-dimensional radiation-hydrodynamics
-        calculation: opacity, ionisation, deep stratification, shocks, magnetic
-        fields and calibrated boundary conditions remain unresolved. The
-        preferred model does not predict core collapse anywhere on this 500-year
-        timeline.
+        The surface shape now stays within observed near-IR and sub-mm asymmetry
+        scales, while colour and radius change with the selected emitting layer.
+        It remains a reduced spherical surface solver—not a three-dimensional
+        radiation-hydrodynamics calculation. The radio view is explicitly
+        false-colour; opacity, line formation, ionisation, deep stratification,
+        shock capturing, magnetic fields, dust radiative transfer and calibrated
+        boundary conditions remain unresolved. The preferred model does not
+        predict core collapse anywhere on this 500-year timeline.
       </p>
     </div>
   );
