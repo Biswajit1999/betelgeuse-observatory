@@ -37,7 +37,7 @@ python science/ingestion/aavso_history.py
 
 The public derived CSV is
 `public/downloads/betelgeuse-historical-photometry-1836-2026.csv`. Its SHA-256
-is `f8432777253ab321a355ab9d6a54e2622fb5cc587a8c38f8bb98124ad65ca8e2`.
+is `1b804b6b95e7f28b13b1414ae1773c11a62671b7860894972ad88bba5202fd71`.
 
 We gratefully acknowledge the contributions of the AAVSO observer community,
 whose photometric data and metadata resources were used in this study and made

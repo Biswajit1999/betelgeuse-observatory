@@ -96,7 +96,7 @@ products:
     source_url: https://www.aavso.org/vsx/index.php?oid=24710&view=detail.top
     publication: https://www.aavso.org/aavso-international-database-aid
     licence: AAVSO data policy and acknowledgement requirements apply
-    sha256: f8432777253ab321a355ab9d6a54e2622fb5cc587a8c38f8bb98124ad65ca8e2
+    sha256: 1b804b6b95e7f28b13b1414ae1773c11a62671b7860894972ad88bba5202fd71
     local_path: public/downloads/betelgeuse-historical-photometry-1836-2026.csv
     downloaded_at: 2026-08-31
     pipeline_version: science/ingestion/aavso_history.py-v1
@@ -120,7 +120,7 @@ products:
     source_url: https://arxiv.org/abs/2006.15403
     publication: https://arxiv.org/abs/2006.15403
     licence: source citation required; derived table values reproduced with attribution
-    sha256: f8432777253ab321a355ab9d6a54e2622fb5cc587a8c38f8bb98124ad65ca8e2
+    sha256: 1b804b6b95e7f28b13b1414ae1773c11a62671b7860894972ad88bba5202fd71
     local_path: public/downloads/betelgeuse-historical-photometry-1836-2026.csv
     downloaded_at: 2026-08-31
     pipeline_version: science/ingestion/aavso_history.py-v1

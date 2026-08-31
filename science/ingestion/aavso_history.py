@@ -217,7 +217,9 @@ def _herschel_rows() -> list[dict[str, float | int | str | bool]]:
 def write_raw(rows: list[dict[str, str]], path: Path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", newline="", encoding="utf-8") as handle:
-        writer = csv.DictWriter(handle, fieldnames=RAW_FIELDS, extrasaction="ignore")
+        writer = csv.DictWriter(
+            handle, fieldnames=RAW_FIELDS, extrasaction="ignore", lineterminator="\n"
+        )
         writer.writeheader()
         writer.writerows(rows)
 
@@ -261,7 +263,7 @@ def write_outputs(rows: list[dict[str, str]], root: Path) -> dict[str, int | flo
 
     payload = {"metadata": metadata, "herschel": herschel, "overview": overview, "recent": recent}
     (sample_dir / "betelgeuse_historical_lightcurve.json").write_text(
-        json.dumps(payload, indent=2) + "\n", encoding="utf-8"
+        json.dumps(payload, indent=2) + "\n", encoding="utf-8", newline="\n"
     )
 
     output_csv = public_dir / "betelgeuse-historical-photometry-1836-2026.csv"
@@ -282,7 +284,9 @@ def write_outputs(rows: list[dict[str, str]], root: Path) -> dict[str, int | flo
         "uncertain",
     )
     with output_csv.open("w", newline="", encoding="utf-8") as handle:
-        writer = csv.DictWriter(handle, fieldnames=fields, extrasaction="ignore")
+        writer = csv.DictWriter(
+            handle, fieldnames=fields, extrasaction="ignore", lineterminator="\n"
+        )
         writer.writeheader()
         for item in herschel:
             writer.writerow({"view": "historical point", **item})
@@ -307,6 +311,7 @@ def write_outputs(rows: list[dict[str, str]], root: Path) -> dict[str, int | flo
         "https://vsx.aavso.org/index.php?oid=24710&view=detail.top\n"
         "https://arxiv.org/abs/2006.15403\n",
         encoding="utf-8",
+        newline="\n",
     )
     return metadata
 
