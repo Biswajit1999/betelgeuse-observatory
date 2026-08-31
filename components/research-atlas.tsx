@@ -3,6 +3,7 @@ import { Activity, Binary, Radio, ScanLine, Sigma, Waves } from 'lucide-react';
 import { AuthorForecast } from '@/components/author-forecast';
 import { Betelgeuse3DTimeline } from '@/components/betelgeuse-3d-timeline';
 import { ContourDiagnostics } from '@/components/contour-diagnostics';
+import { HistoricalLightCurve } from '@/components/historical-light-curve';
 import { PredictionWorkbench } from '@/components/prediction-workbench';
 import { QuantitativePanels } from '@/components/quantitative-panels';
 import { ScenarioSwitcher } from '@/components/scenario-switcher';
@@ -174,6 +175,7 @@ export function ResearchAtlas() {
             uncertainties; fitted curves are calculated quantities.
           </p>
           <QuantitativePanels />
+          <HistoricalLightCurve />
           <ContourDiagnostics />
         </div>
       </section>

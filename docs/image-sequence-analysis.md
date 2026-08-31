@@ -34,3 +34,17 @@ This simplified denominator is valid only when the two noise fields are independ
 Do not decode thousands of full-resolution frames simultaneously. Precompute registered thumbnails or tiled pyramids; decode the current and adjacent frames; move FITS parsing, reprojection, convolution, and cube slicing to a worker; keep raw data and beam metadata outside Git. Spectral cubes should be explored as channel maps with frequency/velocity and line metadata visible on every frame.
 
 The committed ALMA PNG is an editorial preview and cannot supply a scientific time sequence. Retrieve calibrated 2015 and 2023 ALMA products before producing a quantitative epoch-difference result.
+
+## Why the historical record is plotted, not blinked
+
+Betelgeuse has a long photometric record but not two centuries of resolved
+images. Herschel's nineteenth-century entries are comparison-star brightness
+estimates; the AAVSO archive is primarily unresolved optical/NIR photometry.
+Those measurements belong in a magnitude-versus-time plot with passbands,
+sampling, uncertainty, and gaps visible. Turning them into synthetic star
+images and blinking those frames would add unsupported spatial information.
+
+Only modern resolved observations may enter the image comparator, and only
+after the registration, unit, PSF/beam, and uncertainty conditions above are
+met. The historical light curve and the modern image sequence answer different
+questions and must remain separate.

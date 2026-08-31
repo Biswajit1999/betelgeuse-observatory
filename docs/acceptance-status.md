@@ -19,6 +19,7 @@ This matrix defines the version 1.0 repository release. It separates completed s
 - [x] The standard Next.js production build generates a static export successfully.
 - [x] Published numerical values shown in the web experience link to sources.
 - [x] Published ALMA continuum flux, uncertainty, angular-diameter, and brightness-temperature values have plotted and tabular representations.
+- [x] The 1836--2026 brightness record uses 27 published Herschel reconstructions and 51,460 quality-screened AAVSO detections, keeps visual and Johnson V series separate, exposes bin scatter, and includes a reproducible public CSV.
 - [x] Band 8 contour, residual, and radial spectral-index panels reconstruct published fit conventions while explicitly refusing to represent the result as calibrated observed pixels.
 - [x] The continuum workbench provides bounded in-band predictions, standardized residuals, and an explicit incomplete-uncertainty warning.
 - [x] The local blink comparator supports large rendered-image sequences while refusing quantitative differencing without registered, beam-matched data.
@@ -37,9 +38,9 @@ These are deliberately outside the version 1.0 distributable data package:
 
 | Extension                                    | Current release status                                                                                                       | Completion evidence required                                                                                                   |
 | -------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| AAVSO photometry and MAST/HST spectra        | Official retrieval routes and manifest contracts are present; licensed products are not redistributed.                       | Selected product identifiers, retrieval dates, licences, SHA-256 hashes, units, and uncertainty columns.                       |
+| MAST/HST spectra                             | Official retrieval routes and manifest contracts are present; selected spectra have not been downloaded.                     | Selected product identifiers, retrieval dates, licences, SHA-256 hashes, units, and uncertainty columns.                       |
 | ALMA 2015/2023 re-reduction                  | Programme identifiers, query URLs, safety notes, and target paths are present; multi-gigabyte measurement sets are excluded. | Calibrated products, CASA version, imaging parameters, common restoring beam, and product hashes.                              |
 | Measured spectral and epoch-difference plots | Equations, metadata requirements, and interactive explanation are implemented; no values are invented.                       | Registered calibrated inputs, propagated covariance, line metadata, and held-out epoch checks.                                 |
-| Extended time-series baselines               | Robust anomaly and continuum baselines are tested; additional methods are a subsequent data-analysis study.                  | Predeclared evaluation split, Lomb-Scargle/GP/PCA/change-point/AR results, residual diagnostics, and reproducible run records. |
+| Extended time-series baselines               | Historical AAVSO/Herschel visualisation and robust bins are complete; predictive methods remain a subsequent analysis study. | Predeclared evaluation split, Lomb-Scargle/GP/PCA/change-point/AR results, residual diagnostics, and reproducible run records. |
 
 The version 1.0 repository is complete within its stated evidence boundary. Future archive analyses should be released as new, independently reproducible data versions rather than retroactively checking boxes without the required products.

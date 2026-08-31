@@ -104,14 +104,15 @@ The core datasets are summarized in Table~\ref{tab:data}. Exact access notes and
 \caption{Primary observational inputs and their role in the project.}
 \label{tab:data}
 \small
-\begin{tabularx}{\textwidth}{@{}p{0.23\textwidth}p{0.18\textwidth}X p{0.20\textwidth}@{}}
+\begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{0.23\textwidth}>{\raggedright\arraybackslash}p{0.18\textwidth}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}p{0.20\textwidth}@{}}
 \toprule
 Dataset & Epoch & Scientific role & Repository status \\
 \midrule
 ALMA 2022.A.00026.S & August 2023 & Bands 6, 7, and 8 continuum and molecular structure & Published values and attributed preview \\
 ALMA 2015.1.00206.S & 9 November 2015 & Beam-aware temporal comparison target & Provenance record \\
 ESO 114.28H9 & 6 December 2024 & SPHERE-ZIMPOL companion candidate & Official archive reference \\
-AAVSO AID & Query dependent & Long-baseline multi-band photometry & Retrieval contract \\
+Herschel / Lloyd & 1836--1840 & Earliest reconstructed visual estimates & 27 attributed values \\
+AAVSO AID & 1893--2026 & Long-baseline visual and Johnson V photometry & 51,460 screened detections \\
 MAST/HST & Product dependent & Ultraviolet chromosphere and wind spectra & Retrieval contract \\
 \bottomrule
 \end{tabularx}
@@ -131,6 +132,43 @@ The ALMA editorial image in Figure~\ref{fig:alma} is included for orientation an
 \caption{ALMA Band 8 editorial preview of Betelgeuse, observed on 1 August 2023. Source: Dent et al. (2026), programme 2022.A.00026.S, CC BY 4.0. This rendered image is contextual, not a quantitative analysis input.}
 \label{fig:alma}
 \end{figure}
+
+\subsection{Historical brightness record}
+
+I treat the long brightness history as photometry rather than as an image
+sequence. The earliest layer consists of 27 visual magnitudes reconstructed by
+Lloyd from William Herschel's 1836--1840 comparison-star sequences
+\cite{lloyd2020}. The machine-readable layer comes from the AAVSO International
+Database, target AUID \texttt{000-BBK-383} \cite{aavso2026}. My reproducible
+query returned 51,546 rows spanning 10 December 1893 to 30 August 2026. I
+excluded 55 upper-limit rows and 31 values outside the deliberately broad
+$-0.5\leq m\leq3.0$ target-specific plausibility screen, leaving 48,378 visual
+and 3,082 Johnson V detections.
+
+I never merge the two AAVSO passbands. For each passband and time bin $k$, the
+displayed central value and descriptive scatter are
+\begin{equation}
+  \widetilde m_k=\operatorname{median}_{i\in k}(m_i),\qquad
+  \operatorname{IQR}_k=Q_{3,k}-Q_{1,k}.
+\end{equation}
+The full 1836--2026 view uses 90-day bins and the 2010--2026 detail uses 30-day
+bins. Empty bins remain empty, so no line is drawn across a sufficiently long
+gap. The optional relative-flux view applies the exact magnitude relation
+\begin{equation}
+  \frac{F}{F_0}=10^{-0.4(m-m_0)},\qquad m_0=0.5,
+\end{equation}
+and is a change of scale rather than a forecast. The committed derived CSV
+contains medians, quartiles, median absolute deviations, bin populations,
+Julian dates, and decimal years. The row-level AAVSO export remains in the
+gitignored raw-data area and can be regenerated with
+\texttt{science/ingestion/aavso\_history.py}.
+
+This distinction is central to the website design. Nineteenth-century visual
+estimates contain no resolved surface information, and most of the AAVSO
+record is unresolved photometry. Rendering those numbers as synthetic stellar
+images would manufacture morphology that was never observed. The brightness
+record is therefore plotted; only modern, registered, matched-resolution image
+products belong in the blink comparator.
 
 \section{Causality and light-travel time}
 
@@ -278,6 +316,11 @@ Z_t(x,y)=\frac{\Delta I_t(x,y)}
 \end{equation}
 
 The browser comparator can blink as many as 5,000 local PNG, JPEG, or WebP frames. It is intentionally visual-only: local files are decoded in the browser, ordered, played, paused, scrubbed, and cleared without being uploaded. Quantitative differencing is refused unless calibrated, registered, beam-matched products are supplied. This separation lets the interface support rapid human inspection without assigning scientific confidence to display pixels.
+
+The long-baseline photometric graph and the blink comparator are therefore
+complementary rather than interchangeable: the first measures unresolved
+brightness versus time, while the second inspects spatial morphology in modern
+resolved products.
 
 \section{Evolutionary scenarios and prediction}
 
@@ -447,6 +490,7 @@ The most valuable next steps are therefore concrete:
   \item retrieve line cubes and measure spatially resolved centroids, widths, asymmetry, and equivalent widths;
   \item build a registered, beam-matched temporal cube with product-level checksums;
   \item combine long-baseline photometry with radial velocity, astrometry, and resolved radio geometry to test the companion phase model;
+  \item predeclare train/validation epochs and compare Lomb--Scargle, Gaussian-process, change-point, and autoregressive descriptions without confusing periodic atmospheric variability with an explosion classifier;
   \item compare radius constraints and pulsation mode assignments in a joint likelihood rather than by narrative selection;
   \item replace the reduced surface layer with a validated radiation-hydrodynamic simulation when suitable outputs and compute resources are available.
 \end{enumerate}
@@ -457,10 +501,24 @@ A genuine update to my prediction requires evidence that changes the stellar-evo
 
 Betelgeuse Observatory turns an attention-grabbing question into a sequence of testable scientific statements. The light-cone algebra shows that a remaining-lifetime estimate maps directly to the same waiting time at Earth. Published 2023 ALMA values establish a resolved, approximately 2300 K, asymmetric sub-millimetre atmosphere and support quantitative continuum and component checks. They do not establish core collapse. My preferred period interpretation supports a long horizon, for which I state 202,026 CE only as a representative conditional point. The short 2056--2326 CE branch remains visible because it is a real model-family consequence, but its assumptions and radius tension remain attached.
 
-The repository is complete as a reproducible research foundation: it joins equations, data provenance, tests, contour diagnostics, image and spectral methods, scenario logic, a physics-coupled three-dimensional visualization, limitations, and authorship. Its purpose is not to manufacture certainty. Its purpose is to make every claim inspectable.
+The repository is complete as a reproducible research foundation: it joins a
+190-year measured brightness record, equations, data provenance, tests,
+contour diagnostics, image and spectral methods, scenario logic, a
+physics-coupled three-dimensional visualization, limitations, and authorship.
+Its purpose is not to manufacture certainty. Its purpose is to make every
+claim inspectable.
 
 \clearpage
 \begin{thebibliography}{99}
+
+\bibitem{lloyd2020}
+C. Lloyd, ``Betelgeuse---A Century and more of Variation,'' 2020,
+arXiv:2006.15403. \url{https://arxiv.org/abs/2006.15403}
+
+\bibitem{aavso2026}
+American Association of Variable Star Observers, ``AAVSO International
+Database: Alpha Orionis / AUID 000-BBK-383,'' photometric records retrieved
+31 August 2026. \url{https://www.aavso.org/index.php/data-access}
 
 \bibitem{dent2026}
 W. R. F. Dent et al., ``New views of Betelgeuse: multi-band ALMA imaging of the sub-mm atmosphere,'' 2026, arXiv:2608.19339. \url{https://arxiv.org/abs/2608.19339}

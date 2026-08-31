@@ -84,23 +84,47 @@ products:
     telescope: heterogeneous observer network
     instrument: heterogeneous visual and photoelectric/CCD photometry
     programme_id: AAVSO-AID-target-alpha-ori
-    observation_start: null
-    observation_end: null
-    publication_date: null
-    spectral_coverage: multiple passbands; query-dependent
+    observation_start: 1893-12-10
+    observation_end: 2026-08-30
+    publication_date: 2026-08-31
+    spectral_coverage: visual estimates and Johnson V photometry
     bandwidth: filter-dependent
     spatial_resolution: unresolved photometry
     spectral_resolution: not applicable
-    processing_level: validated observation records; query/export required
+    processing_level: 51,546 returned records; 51,460 detections retained after target-specific quality screening; passband-separated 90-day and 30-day robust summaries
     units: magnitudes and reported uncertainties
-    source_url: https://www.aavso.org/data-download
+    source_url: https://www.aavso.org/vsx/index.php?oid=24710&view=detail.top
     publication: https://www.aavso.org/aavso-international-database-aid
     licence: AAVSO data policy and acknowledgement requirements apply
-    sha256: null
-    local_path: null
-    downloaded_at: null
-    pipeline_version: null
-    status: manual_or_authenticated_retrieval
+    sha256: f8432777253ab321a355ab9d6a54e2622fb5cc587a8c38f8bb98124ad65ca8e2
+    local_path: public/downloads/betelgeuse-historical-photometry-1836-2026.csv
+    downloaded_at: 2026-08-31
+    pipeline_version: science/ingestion/aavso_history.py-v1
+    status: committed_derived_summary_raw_gitignored
+
+  - dataset_id: herschel_betelgeuse_visual_1836_1840
+    target: Alpha Orionis
+    observatory: historical naked-eye comparison sequences
+    telescope: unaided visual estimates
+    instrument: comparison-star sequences reconstructed by Lloyd (2020)
+    programme_id: not applicable
+    observation_start: 1836-03-22
+    observation_end: 1840-04-18
+    publication_date: 2020-06-29
+    spectral_coverage: historical visual estimates; not Johnson V
+    bandwidth: not applicable
+    spatial_resolution: unresolved photometry
+    spectral_resolution: not applicable
+    processing_level: 27 magnitudes transcribed from Lloyd (2020), Table 1; two parenthesised uncertain values retained and flagged
+    units: reconstructed visual magnitude
+    source_url: https://arxiv.org/abs/2006.15403
+    publication: https://arxiv.org/abs/2006.15403
+    licence: source citation required; derived table values reproduced with attribution
+    sha256: f8432777253ab321a355ab9d6a54e2622fb5cc587a8c38f8bb98124ad65ca8e2
+    local_path: public/downloads/betelgeuse-historical-photometry-1836-2026.csv
+    downloaded_at: 2026-08-31
+    pipeline_version: science/ingestion/aavso_history.py-v1
+    status: committed_derived_table
 
   - dataset_id: mast_hst_betelgeuse_uv
     target: Betelgeuse

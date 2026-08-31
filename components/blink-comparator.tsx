@@ -73,6 +73,8 @@ export function BlinkComparator() {
       <p>
         Load up to {MAX_FRAMES.toLocaleString()} aligned PNG, JPEG, or WebP
         frames. Files remain in this browser session and are not transmitted.
+        The century-scale record is photometry, not a sequence of resolved
+        photographs; use the historical light curve above for that evidence.
       </p>
 
       <div className="blink-stage">

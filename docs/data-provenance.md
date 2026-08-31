@@ -12,6 +12,37 @@ Null values mean the archive query has not yet selected a product. They are not 
 - Small redistributable examples live in `data/samples/` with sources and hashes.
 - CASA is required for ALMA visibility calibration and interferometric imaging.
 
+## Historical photometry
+
+The long-baseline brightness product is deliberately not an image sequence.
+It combines 27 magnitudes reconstructed from William Herschel's 1836--1840
+comparison sequences in Lloyd (2020), Table 1, with AAVSO AID measurements
+from 1893-12-10 through 2026-08-30. The AAVSO records remain split into
+`Vis.` estimates and Johnson `V`; these passbands are not interchangeable.
+
+`science/ingestion/aavso_history.py` retrieves three non-overlapping Julian
+Date intervals from the official VSX/AID endpoint, deduplicates observation
+IDs, excludes upper limits, and applies a broad `-0.5 <= magnitude <= 3.0`
+plausibility screen. Of 51,546 returned rows, 51,460 detections are retained:
+48,378 visual and 3,082 Johnson V. The committed CSV contains 90-day medians
+and quartiles for the full overview and 30-day medians and quartiles from 2010
+onward. It inserts no values in empty bins. The complete row-level export is
+written to gitignored `data/raw/aavso_alpha_ori_1893_2026.csv`.
+
+Reproduce the retrieval and summaries from the repository root:
+
+```bash
+python science/ingestion/aavso_history.py
+```
+
+The public derived CSV is
+`public/downloads/betelgeuse-historical-photometry-1836-2026.csv`. Its SHA-256
+is `f8432777253ab321a355ab9d6a54e2622fb5cc587a8c38f8bb98124ad65ca8e2`.
+
+We gratefully acknowledge the contributions of the AAVSO observer community,
+whose photometric data and metadata resources were used in this study and made
+available through the AAVSO's scientific archives.
+
 ## Retrieval
 
-`science/ingestion/alma.py` prints explicit programme query URLs and safety notes without downloading anything. AAVSO, MAST, and ESO archive entries point to their official interfaces. Authentication, acknowledgements, or data-access terms must be completed by the researcher; the repository never bypasses them.
+`science/ingestion/alma.py` prints explicit programme query URLs and safety notes without downloading anything. MAST and ESO archive entries point to their official interfaces. Authentication, acknowledgements, or data-access terms must be completed by the researcher; the repository never bypasses them. The AAVSO script uses the public VSX/AID query endpoint and preserves the recommended acknowledgement.

@@ -64,6 +64,7 @@ The complete first-person scientific and engineering write-up is available as [L
 - A two-piece-normal Monte Carlo distance posterior: 172 pc with +13 / -11 pc uncertainty.
 - A typed Python science package with tested light-time, angular-size, and continuum calculations.
 - Reproduction of the simple three-point ALMA integrated-flux fit, `alpha = 1.49 +/- 0.13`.
+- A real 1836--2026 brightness history: 27 Herschel-era reconstructed estimates plus 51,460 quality-screened AAVSO detections, with visual and Johnson V measurements plotted separately.
 - Interactive Band 8 contour, axisymmetric-residual, and matched-beam radial-profile reconstructions following the published figure conventions while clearly separating fitted reconstructions from observed pixels.
 - An interactive in-band continuum forecast with standardized residuals and explicit incomplete-uncertainty warning.
 - A local blink comparator for up to 5,000 registered image frames; rendered images remain in the browser and are not treated as calibrated FITS measurements.
@@ -109,10 +110,49 @@ This is an author-selected point inside a broad preferred model family—not a f
 | ALMA 2022.A.00026.S | August 2023       | 19 August 2026 preprint        | Bands 6/7/8 continuum and line structure |
 | ALMA 2015.1.00206.S | 9 November 2015   | 2017 paper                     | Beam-aware temporal comparison           |
 | ESO 114.28H9        | 6 December 2024   | 19 August 2026 archive release | SPHERE-ZIMPOL companion candidate        |
-| AAVSO AID           | query-dependent   | continuously updated           | Long-term multi-band photometry          |
+| Herschel / Lloyd    | 1836-1840         | Lloyd (2020)                   | Earliest reconstructed visual estimates  |
+| AAVSO AID           | 1893-2026         | retrieved 31 August 2026       | Visual and Johnson V light curves        |
 | MAST/HST            | product-dependent | product-dependent              | UV chromosphere and wind spectra         |
 
 Exact fields, access conditions, checksums, and local paths live in [`data/manifest.yaml`](data/manifest.yaml). Raw and multi-gigabyte data are never committed.
+
+### Historical brightness data
+
+The website now plots Betelgeuse brightness against received-light time over
+190 years. It begins with the 27 comparison-sequence magnitudes reconstructed
+from William Herschel's 1836--1840 observations by
+[Lloyd (2020)](https://arxiv.org/abs/2006.15403). From 1893-12-10 through
+2026-08-30 it uses the
+[AAVSO International Database](https://www.aavso.org/index.php/data-access),
+AUID `000-BBK-383`: 48,378 visual estimates and 3,082 Johnson V detections
+after excluding upper limits and a small number of implausible values.
+
+The two AAVSO passbands are never silently merged. The full-range plot uses
+90-day medians and interquartile ranges; the 2010--2026 detail uses 30-day
+bins. Empty intervals remain empty. The switch from magnitude to relative
+flux evaluates
+
+```text
+F/F0 = 10^[-0.4 (m - m0)] , with m0 = 0.5
+```
+
+and is a unit conversion, not a prediction. Download the
+[derived 1836--2026 CSV](public/downloads/betelgeuse-historical-photometry-1836-2026.csv)
+or reproduce both the row-level local export and the public summaries:
+
+```bash
+python science/ingestion/aavso_history.py
+```
+
+The row-level AAVSO file is written to the gitignored path
+`data/raw/aavso_alpha_ori_1893_2026.csv`; it is not pushed to GitHub. For a
+local copy or help obtaining larger calibrated image/spectral products,
+[email Biswajit Jana](mailto:bj7585063100@gmail.com) or
+[connect on LinkedIn](https://www.linkedin.com/in/biswajit-jana-27011a151/).
+
+We gratefully acknowledge the contributions of the AAVSO observer community,
+whose photometric data and metadata resources were used in this study and made
+available through the AAVSO's scientific archives.
 
 ### Test the blink comparator
 
@@ -217,6 +257,13 @@ foundation, but it deliberately leaves the following questions open:
 
 - The committed ALMA panels are rendered publication figures, not FITS images
   or visibility data; they support visual inspection only.
+- The nineteenth-century record consists of brightness estimates, and the
+  AAVSO record consists of unresolved photometry—not centuries of resolved
+  photographs. They are therefore plotted as a light curve rather than blinked
+  as synthetic images.
+- Historical visual estimates and Johnson V photometry have different response
+  functions, sampling, and observer/systematics; bin quartiles are descriptive
+  scatter, not a complete calibrated-error model.
 - The three-frame test set spans observing bands rather than epochs and has
   unequal beams, calibration uncertainties, and brightness scales.
 - No current observation directly measures the core-burning stage or provides
