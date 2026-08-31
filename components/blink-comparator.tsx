@@ -2,7 +2,14 @@
 
 import Image from 'next/image';
 import { ChangeEvent, useEffect, useRef, useState } from 'react';
-import { ChevronLeft, ChevronRight, Images, Pause, Play } from 'lucide-react';
+import {
+  ChevronLeft,
+  ChevronRight,
+  Download,
+  Images,
+  Pause,
+  Play,
+} from 'lucide-react';
 import { useReducedMotion } from 'motion/react';
 
 import { siteAsset } from '@/lib/site-path';
@@ -128,7 +135,38 @@ export function BlinkComparator() {
           accept="image/png,image/jpeg,image/webp"
           multiple
           onChange={loadFrames}
+          aria-describedby="blink-files-help blink-files-contact"
         />
+        <div id="blink-files-help" className="blink-file-help">
+          <a
+            className="blink-download"
+            href={siteAsset(
+              '/downloads/betelgeuse-alma-2023-visual-blink-test.zip',
+            )}
+            download
+          >
+            <Download aria-hidden="true" size={16} />
+            Download the three-frame test bundle
+          </a>
+          <p>
+            Unzip it, then select all three numbered PNG files above. These
+            August 2023 Bands 6/7/8 paper panels test visual blinking only; they
+            are not a calibrated time sequence.
+          </p>
+        </div>
+        <p id="blink-files-contact" className="blink-contact">
+          For additional registered frames or calibrated archive-product
+          details,{' '}
+          <a href="mailto:bj7585063100@gmail.com">email Biswajit Jana</a> or{' '}
+          <a
+            href="https://www.linkedin.com/in/biswajit-jana-27011a151/"
+            target="_blank"
+            rel="noreferrer"
+          >
+            connect on LinkedIn
+          </a>
+          .
+        </p>
         <label htmlFor="blink-rate">
           Blink rate: {framesPerSecond} frame{framesPerSecond === 1 ? '' : 's'}{' '}
           s<sup>−1</sup>

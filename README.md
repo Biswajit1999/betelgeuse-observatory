@@ -15,6 +15,45 @@
 
 _ALMA Band 8 editorial preview from Dent et al. (2026), observed 1 August 2023 under programme 2022.A.00026.S. CC BY 4.0. Scientific analysis must use calibrated archive products rather than this rendered figure._
 
+## About Betelgeuse
+
+Betelgeuse, also catalogued as Alpha Orionis (α Ori) and HD 39801, is an
+M-type red supergiant marking the reddish shoulder of the constellation
+Orion. Its ICRS J2000 position is right ascension
+`05 h 55 m 10.30536 s`, declination `+07° 24′ 25.4304″`
+([SIMBAD](https://simbad.harvard.edu/simbad/sim-basic?Ident=Betelgeuse&submit=SIMBAD+search)).
+The star is bright enough to see without a telescope and is one of the few
+stars beyond the Sun whose atmosphere can be spatially resolved.
+
+Its distance is scientifically important and unusually difficult to measure:
+surface inhomogeneities move the photocentre, while its brightness complicates
+high-precision astrometry. This project adopts the
+`172 pc (+13/−11 pc)` estimate used by Dent et al., equivalent to approximately
+`561 (+42/−36) light-years`; broader summaries commonly quote roughly
+600–700 light-years. The spread is a measurement issue, not evidence that the
+star physically changes distance
+([Dent et al. 2026](https://arxiv.org/html/2608.19339),
+[NASA](https://science.nasa.gov/universe/what-is-betelgeuse-inside-the-strange-volatile-star/)).
+
+Betelgeuse is an unusually valuable laboratory because it combines proximity,
+large angular diameter, semiregular pulsation, giant convective structures,
+episodic mass loss, molecule and dust formation, and a circumstellar
+environment that can be examined from ultraviolet through radio wavelengths.
+The 2019–2020 Great Dimming connected surface convection, atmospheric outflow,
+cooling, and dust obscuration in a directly observable event. Studying these
+processes constrains how red supergiants return chemically enriched material
+to the interstellar medium and how massive-star envelopes evolve before a
+future core-collapse supernova
+([NASA/Hubble](https://science.nasa.gov/missions/hubble/hubble-finds-that-betelgeuses-mysterious-dimming-is-due-to-a-traumatic-outburst/),
+[Wheeler & Chatzopoulos 2023](https://academic.oup.com/astrogeo/article/64/3/3.11/7160552)).
+
+The star is also a reminder that “nearby” and “soon” are not the same claim.
+The light received now left Betelgeuse centuries ago, while its remaining
+lifetime depends on uncertain mass, radius, mixing, pulsation-mode assignment,
+rotation, mass loss, and possible binary interaction. Continued monitoring is
+therefore scientifically useful even though no received observation presently
+shows core collapse.
+
 ## Full research report
 
 The complete first-person scientific and engineering write-up is available as [LaTeX source](paper/betelgeuse-observatory-report.tex) and a [compiled PDF](output/pdf/betelgeuse-observatory-report.pdf). It documents the research rationale, equations, data boundaries, contour reconstruction, prediction assumptions, reduced hydrodynamic solver, implementation chronology, tests, limitations, and reproduction commands.
@@ -28,6 +67,7 @@ The complete first-person scientific and engineering write-up is available as [L
 - Interactive Band 8 contour, axisymmetric-residual, and matched-beam radial-profile reconstructions following the published figure conventions while clearly separating fitted reconstructions from observed pixels.
 - An interactive in-band continuum forecast with standardized residuals and explicit incomplete-uncertainty warning.
 - A local blink comparator for up to 5,000 registered image frames; rendered images remain in the browser and are not treated as calibrated FITS measurements.
+- A downloadable three-frame ALMA Bands 6/7/8 visual test bundle, with source, licence, and quantitative-use limitations included alongside the files.
 - A GPU-accelerated 3D timeline from 2026–2526 CE driven by a reduced gas-flow solver for temperature, density, horizontal/radial velocity, buoyancy, pressure response, viscosity, thermal diffusion, compressional heating, and radiative relaxation.
 - A provenance manifest for ALMA 2015/2023, ESO SPHERE 2024, AAVSO, and MAST/HST.
 - An evidence language that visibly separates measured, calculated, simulated, model-dependent, and speculative material.
@@ -73,6 +113,14 @@ This is an author-selected point inside a broad preferred model family—not a f
 | MAST/HST            | product-dependent | product-dependent              | UV chromosphere and wind spectra         |
 
 Exact fields, access conditions, checksums, and local paths live in [`data/manifest.yaml`](data/manifest.yaml). Raw and multi-gigabyte data are never committed.
+
+### Test the blink comparator
+
+Download [`betelgeuse-alma-2023-visual-blink-test.zip`](public/downloads/betelgeuse-alma-2023-visual-blink-test.zip), extract it, and select the three numbered PNG files in the web comparator. The files are rendered Bands 6/7/8 panels from Dent et al. (2026), supplied under CC BY 4.0 to test the interface. They share a field of view but are not a calibrated, beam-matched time sequence; apparent differences must not be interpreted as temporal evolution.
+
+For additional registered frames or calibrated archive-product details,
+[email Biswajit Jana](mailto:bj7585063100@gmail.com) or
+[connect on LinkedIn](https://www.linkedin.com/in/biswajit-jana-27011a151/).
 
 ## Quick start
 
@@ -140,6 +188,46 @@ These assumptions are never blended. Read [evolutionary scenarios](docs/evolutio
 - [Release status and archive-dependent extensions](docs/acceptance-status.md)
 
 The Great Dimming is not labelled a known pre-supernova event. Press-release or paper-rendered images are editorial assets only; calibrated FITS and archive products are required for quantitative scientific analysis.
+
+## Open research questions
+
+This release establishes a reproducible observational and modelling
+foundation, but it deliberately leaves the following questions open:
+
+- Which pulsation mode is the approximately 400-day signal, and what does that
+  imply for the present core-burning stage and remaining lifetime?
+- Is the approximately 2,100–2,200-day variability primarily pulsation,
+  convection, binary modulation, or a coupled response?
+- Will follow-up astrometry confirm Betelgeuse B on the predicted orbit, and
+  how strongly can that companion alter mass loss, rotation, mixing, or the
+  eventual explosion geometry?
+- Why do the ALMA hot regions appear more persistent than current
+  three-dimensional convection models predict?
+- How are photospheric convection, shocks, molecular cooling, dust formation,
+  and episodic dimming causally connected across observable atmospheric
+  layers?
+- Can calibrated, beam-matched ALMA epochs distinguish real structural
+  evolution from frequency-dependent opacity, reconstruction choices, and
+  astrometric error?
+- Which observable precursor—neutrinos, gravity waves, spectral changes,
+  photometric behaviour, or circumstellar interaction—would provide the first
+  defensible evidence of imminent core collapse?
+
+### Present limitations
+
+- The committed ALMA panels are rendered publication figures, not FITS images
+  or visibility data; they support visual inspection only.
+- The three-frame test set spans observing bands rather than epochs and has
+  unequal beams, calibration uncertainties, and brightness scales.
+- No current observation directly measures the core-burning stage or provides
+  a precise supernova countdown.
+- Distance, radius, initial/current mass, internal rotation, mixing, and
+  mass-loss history remain correlated sources of model uncertainty.
+- The reduced hydrodynamic visualisation is an explanatory model, not a
+  radiation-hydrodynamic forecast of a unique future surface.
+- Archive-dependent conclusions require independently retrieved products,
+  recorded checksums, a documented CASA or spectral reduction, uncertainty
+  propagation, and held-out validation before publication.
 
 ## Visual verification
 

@@ -1201,6 +1201,39 @@ a {
   width: 100%;
   accent-color: var(--calculated);
 }
+.blink-file-help {
+  display: grid;
+  gap: 0.55rem;
+  padding: 0.9rem;
+  border-left: 2px solid var(--calculated);
+  background: #0d1215;
+}
+.blink-file-help p,
+.blink-contact {
+  margin: 0;
+  color: #aeb2b8 !important;
+  font-size: 0.76rem;
+  line-height: 1.55;
+}
+.blink-download {
+  width: fit-content;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--calculated);
+  font: 650 0.78rem/1.3 var(--font-geist-mono);
+  text-underline-offset: 0.22rem;
+}
+.blink-download:focus-visible,
+.blink-contact a:focus-visible {
+  outline: 2px solid var(--calculated);
+  outline-offset: 3px;
+}
+.blink-contact a {
+  color: var(--calculated);
+  text-underline-offset: 0.22rem;
+}
 .inference-matrix {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

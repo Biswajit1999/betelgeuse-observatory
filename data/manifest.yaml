@@ -149,3 +149,27 @@ products:
     downloaded_at: 2026-08-30
     pipeline_version: direct-source-figure-v1
     status: committed_editorial_preview
+
+  - dataset_id: alma_2023_bands678_visual_blink_bundle
+    target: Betelgeuse
+    observatory: ALMA
+    telescope: Atacama Large Millimeter/submillimeter Array
+    instrument: ALMA Bands 6, 7, and 8
+    programme_id: ADS/JAO.ALMA#2022.A.00026.S
+    observation_start: 2023-08-01
+    observation_end: 2023-08-27
+    publication_date: 2026-08-19
+    spectral_coverage: 223.55, 337.99, and 485.22 GHz rendered continuum panels
+    bandwidth: 7.5 GHz continuum per band in the underlying observations
+    spatial_resolution: 19.6x14.1 mas (Band 6); 10.7x9.5 mas (Band 7); 7.7x6.6 mas (Band 8)
+    spectral_resolution: continuum product; not applicable to the rendered panels
+    processing_level: paper Figure 1 panels packaged for interface testing; not calibrated FITS data and not a time series
+    units: rendered Jy/beam colour scales; band-dependent
+    source_url: https://arxiv.org/html/2608.19339
+    publication: https://arxiv.org/abs/2608.19339
+    licence: CC BY 4.0; attribution to Dent et al. (2026)
+    sha256: 8e0db1197f6f7db6c59b8d4a2aaa9e42263a5fbb3c091bd3eb21865c66db5f4d
+    local_path: public/downloads/betelgeuse-alma-2023-visual-blink-test.zip
+    downloaded_at: 2026-08-31
+    pipeline_version: direct-source-figure-bundle-v1
+    status: committed_editorial_test_bundle
