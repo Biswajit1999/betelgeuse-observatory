@@ -355,9 +355,9 @@ My prediction should change if calibrated evidence establishes the 2200 day sign
 
 \section{Three-dimensional visualization and received-time timeline}
 
-The three-dimensional view covers received years 2026--2526 and has two explicitly distinct branches. The default branch follows the preferred long-horizon interpretation and therefore does not explode within the 500-year window. A conditional branch lets the reader impose a collapse arrival between 2056 and 2326 to inspect the visual consequences of the contested scenario. The control is an assumption switch, not a prediction generator.
+The three-dimensional view covers received years 2026--3026 and has two explicitly distinct branches. The default branch follows the preferred long-horizon interpretation and therefore does not explode through 3026. A conditional branch lets the reader impose a collapse arrival between 2056 and 2326 to inspect free expansion, interaction with the stellar wind, young-remnant deceleration, and an evolved remnant. The control is an assumption switch, not a prediction generator.
 
-The renderer distinguishes two measured emitting layers. The near-infrared continuum uses the $42.49\pm0.06$ mas limb-darkened diameter, $3690\pm54$ K effective temperature, and power-law limb exponent $0.097\pm0.005$ reported by Ohnaka et al.\ \cite{ohnaka2011}. The selectable ALMA Band 7 view uses a 57.74 mas angular diameter and an approximately 2300 K sub-millimetre brightness-temperature layer, with the hottest published patch represented as about 800 K above that mean \cite{dent2026}. The renderer uses a mildly displaced sphere, dynamic surface fields, a translucent extended atmosphere, particles, and restrained bloom. GPU quality modes adjust mesh and gas-grid resolution. Radial surface displacements are capped at approximately the observed percent-level departure from circular symmetry rather than producing large lava-like corrugations.
+The renderer distinguishes two measured emitting layers. The near-infrared continuum uses the $42.49\pm0.06$ mas limb-darkened diameter, $3690\pm54$ K effective temperature, and power-law limb exponent $0.097\pm0.005$ reported by Ohnaka et al.\ \cite{ohnaka2011}. H-band imaging shows few-percent photospheric asymmetry and bright spots rather than a perfectly smooth disk \cite{haubois2009}. The selectable ALMA Band 7 view uses a 57.74 mas angular diameter and an approximately 2300 K sub-millimetre brightness-temperature layer, with the hottest published patch represented as about 800 K above that mean \cite{dent2026}. The renderer uses a mildly displaced sphere, broad warm upflows, cooler intercell lanes, a translucent extended atmosphere, particles, and restrained bloom. GPU quality modes adjust mesh and gas-grid resolution. Radial surface displacements are capped at approximately the observed percent-level departure from circular symmetry rather than producing large lava-like corrugations.
 
 For a blackbody reference, the spectral radiance is
 \begin{equation}
@@ -405,7 +405,7 @@ One numerical step represents 0.25 accelerated surface day and is deliberately i
 
 Important omitted physics includes deep radial stratification, self-consistent gravity, ionization, magnetic fields, shock capturing in the surface solver, nuclear burning, a wavelength-dependent opacity table, and radiative transfer. The interactive viscosity and diffusivity are closure parameters, not measured material coefficients.
 
-For an imposed explosion branch, the forward shock expands freely for the first ten years and then follows $R_{\rm sh}\propto t^{0.875}$, a representative self-similar deceleration in a wind-like circumstellar medium. This is more physical than constant-speed expansion over five centuries, but it remains a scenario visualization rather than a Betelgeuse-specific explosion forecast.
+For an imposed explosion branch, the forward shock expands freely for the first ten years and then follows $R_{\rm sh}\propto t^{0.875}$, a representative self-similar deceleration in a wind-like circumstellar medium. This is more physical than constant-speed expansion over a millennium, but it remains a scenario visualization rather than a Betelgeuse-specific explosion forecast.
 
 \section{Software architecture}
 
@@ -533,6 +533,9 @@ M. Joyce et al., ``Standing on the shoulders of giants: new mass and distance es
 
 \bibitem{ohnaka2011}
 K. Ohnaka et al., ``Imaging the dynamical atmosphere of the red supergiant Betelgeuse in the CO first overtone lines with VLTI/AMBER,'' \emph{Astronomy \& Astrophysics}, 529, A163, 2011. \url{https://arxiv.org/abs/1104.0958}
+
+\bibitem{haubois2009}
+X. Haubois et al., ``Imaging the spotty surface of Betelgeuse in the H band,'' \emph{Astronomy \& Astrophysics}, 508, 923--932, 2009. \url{https://arxiv.org/abs/0910.4167}
 
 \bibitem{lopezariste2018}
 A. L\'opez Ariste et al., ``Convective cells in Betelgeuse: imaging through spectropolarimetry,'' \emph{Astronomy \& Astrophysics}, 620, A199, 2018. \url{https://doi.org/10.1051/0004-6361/201834178}

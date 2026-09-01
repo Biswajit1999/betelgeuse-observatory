@@ -2,9 +2,9 @@
 
 ## Purpose
 
-The interactive renderer is a conditional visual forward model spanning 2026–2526 CE. It is designed to make the consequences of two incompatible evolutionary assumptions visible without presenting procedural graphics as observations.
+The interactive renderer is a conditional visual forward model spanning 2026–3026 CE. It is designed to make the consequences of two incompatible evolutionary assumptions visible without presenting procedural graphics as observations.
 
-The default branch follows the project's preferred interpretation: no collapse is inserted into the next 500 years. The disputed branch permits an imposed Earth-arrival epoch from 2056–2326 CE, corresponding to the published several-dozen-to-several-hundred-year model-family range. The selectable epoch is not a posterior sample, confidence interval, or event probability.
+The default branch follows the project's preferred interpretation: no collapse is inserted through 3026 CE. The disputed branch permits an imposed Earth-arrival epoch from 2056–2326 CE, corresponding to the published several-dozen-to-several-hundred-year model-family range. The selectable epoch is not a posterior sample, confidence interval, or event probability.
 
 ## Observational anchors
 
@@ -29,7 +29,7 @@ L_SB = 4 pi R^2 sigma T_eff^4 = approximately 1.03e5 L_sun.
 
 The alternate ALMA Band 7 view uses `theta = 57.74 mas` and `T_b approximately 2300 K`. Dent et al. (2026) describe the optically thick sub-mm photosphere as approximately 1.1-1.3 times the stellar radius, with an approximately 800 K hot enhancement, radius deviations up to +/-6%, and weaker continuum and molecular emission extending to approximately 2.5 stellar radii. The view is explicitly false-colour because a 338 GHz brightness-temperature map is not a naked-eye image.
 
-The rendered temperature pattern is a reduced qualitative representation of red-supergiant convection and limb darkening. A single resolved two-dimensional brightness map cannot determine a unique three-dimensional temperature, density, or velocity field. The two projected ALMA hot regions are placed approximately on the visible hemisphere; their line-of-sight depths are not measured.
+The rendered temperature pattern is a reduced qualitative representation of red-supergiant convection and limb darkening. The disk is not physically smooth: H-band interferometry finds few-percent photospheric asymmetry and bright spots, while spectropolarimetric inversions infer convective cells with a characteristic size near 0.6 stellar radius. The shader therefore emphasizes broad warm upflows and cooler intercell downflow lanes while keeping radial relief within the observed percent-level envelope. A single resolved two-dimensional brightness map cannot determine a unique three-dimensional temperature, density, or velocity field. The two projected ALMA hot regions are placed approximately on the visible hemisphere; their line-of-sight depths are not measured.
 
 ## Reduced hydrodynamic surface layer
 
@@ -41,7 +41,7 @@ The governing model is a reduced compressible/Boussinesq hybrid:
 partial rho / partial t + div(rho v) = 0
 
 Dv/Dt = -grad(p)/rho + alpha g T' r_hat
-        + nu laplacian(v) - drag + Coriolis-like deflection
+        + nu laplacian(v) - drag
 
 DT/Dt = -(gamma - 1) T div(v) + kappa laplacian(T)
         + Q_conv - T'/tau_rad
@@ -68,7 +68,7 @@ and therefore does not predict calibrated intensity, line profiles, or wavelengt
 
 ## Conditional explosion branch
 
-The imposed-collapse branch visually compresses core collapse, a roughly 15-hour envelope shock-crossing scale for the near-infrared radius and a representative 10,000 km/s shock, breakout, expansion, and remnant development. The large-scale forward-shock readout uses a deliberately simple two-regime law:
+The imposed-collapse branch visually compresses core collapse, a roughly 15-hour envelope shock-crossing scale for the near-infrared radius and a representative 10,000 km/s shock, breakout, expansion, and remnant development. Labels distinguish free expansion (under 10 years), interaction with the stellar wind, a young decelerating shell, and an evolved remnant after 400 years. The large-scale forward-shock readout uses a deliberately simple two-regime law:
 
 ```text
 R_sh(t) = v_ej t                         for t <= 10 yr
@@ -87,7 +87,7 @@ This scale still omits a fitted ejecta energy and mass, a measured circumstellar
 ## GPU implementation
 
 - WebGL high-performance context with ACES tone mapping.
-- High mode: up to 192 x 128 surface tessellation, approximately 6,200 atmospheric particles, 8,500 ejecta particles, and 4,800 background stars.
+- High mode: up to 192 x 128 surface tessellation, approximately 4,200 atmospheric particles, 8,500 ejecta particles, and 4,800 background stars.
 - Efficient mode lowers tessellation, particle counts, and device-pixel ratio.
 - A dedicated worker advances the gas equations away from the rendering thread and transfers the physical state as an RGBA field.
 - Vertex and fragment shaders interpolate the hydrodynamic temperature, density, radial velocity, and speed fields over the 3D sphere.
@@ -98,6 +98,7 @@ This scale still omits a fitted ejecta energy and mass, a measured circumstellar
 ## Primary sources used for the physical anchors
 
 - [Ohnaka et al. (2011), near-IR diameter, limb darkening, temperature, and atmospheric velocities](https://arxiv.org/abs/1104.0958)
+- [Haubois et al. (2009), H-band photospheric asymmetry and bright spots](https://arxiv.org/abs/0910.4167)
 - [Levesque & Massey (2020), optical effective temperature during the Great Dimming](https://arxiv.org/abs/2002.10463)
 - [Joyce et al. (2020), mass and radius ranges](https://arxiv.org/abs/2006.09837)
 - [Lopez Ariste et al. (2018), inferred convection-cell scale and velocities](https://doi.org/10.1051/0004-6361/201834178)

@@ -617,22 +617,27 @@ a {
 }
 .atlas-section {
   display: grid;
-  grid-template-columns: 190px minmax(0, 1fr);
-  gap: clamp(2rem, 5vw, 6rem);
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.5rem;
   padding: 7rem 0;
   border-top: 1px solid #2b2d30;
 }
 .section-index {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  padding-bottom: 0.85rem;
+  border-bottom: 1px solid var(--border);
   color: #777c84;
   font: 600 0.65rem/1.5 var(--font-geist-mono);
   text-transform: uppercase;
   letter-spacing: 0.13em;
 }
 .section-index span {
-  display: block;
+  display: inline-block;
   color: var(--calculated);
   font-size: 0.75rem;
-  margin-bottom: 0.6rem;
+  margin: 0;
 }
 .section-index p {
   margin: 0;
@@ -1762,8 +1767,55 @@ a {
 }
 .stellar-simulation {
   display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(340px, 390px);
   gap: 1rem;
+  align-items: start;
   min-width: 0;
+}
+.stellar-simulation-header {
+  grid-column: 1 / -1;
+  grid-row: 1;
+}
+.stellar-scenario-controls {
+  grid-column: 2;
+  grid-row: 2;
+}
+.stellar-layer-controls {
+  grid-column: 2;
+  grid-row: 3;
+}
+.stellar-physics-controls {
+  grid-column: 2;
+  grid-row: 4;
+}
+.stellar-timeline-controls {
+  grid-column: 2;
+  grid-row: 5;
+}
+.stellar-viewport {
+  grid-column: 1;
+  grid-row: 2 / span 4;
+  align-self: stretch;
+}
+.stellar-readouts {
+  grid-column: 1;
+  grid-row: 6;
+}
+.stellar-ejecta-readout {
+  grid-column: 1 / -1;
+  grid-row: 7;
+}
+.stellar-fact-grid {
+  grid-column: 1 / -1;
+  grid-row: 8;
+}
+.stellar-model-equations {
+  grid-column: 1 / -1;
+  grid-row: 9;
+}
+.stellar-boundary-note {
+  grid-column: 1 / -1;
+  grid-row: 10;
 }
 .stellar-simulation-header {
   display: flex;
@@ -2447,6 +2499,61 @@ html:not(.dark) .stellar-ejecta-readout {
 html:not(.dark) .forecast-boundary,
 html:not(.dark) .stellar-boundary-note {
   background: #fff3f8;
+}
+@media (max-width: 1180px) {
+  .stellar-simulation {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .stellar-simulation
+    > :where(
+      .stellar-simulation-header,
+      .stellar-scenario-controls,
+      .stellar-layer-controls,
+      .stellar-physics-controls,
+      .stellar-timeline-controls,
+      .stellar-viewport,
+      .stellar-readouts,
+      .stellar-ejecta-readout,
+      .stellar-fact-grid,
+      .stellar-model-equations,
+      .stellar-boundary-note
+    ) {
+    grid-column: 1;
+    grid-row: auto;
+  }
+  .stellar-simulation-header {
+    order: 1;
+  }
+  .stellar-scenario-controls {
+    order: 2;
+  }
+  .stellar-layer-controls {
+    order: 3;
+  }
+  .stellar-timeline-controls {
+    order: 4;
+  }
+  .stellar-physics-controls {
+    order: 5;
+  }
+  .stellar-viewport {
+    order: 6;
+  }
+  .stellar-readouts {
+    order: 7;
+  }
+  .stellar-ejecta-readout {
+    order: 8;
+  }
+  .stellar-fact-grid {
+    order: 9;
+  }
+  .stellar-model-equations {
+    order: 10;
+  }
+  .stellar-boundary-note {
+    order: 11;
+  }
 }
 @media (max-width: 1100px) {
   .stellar-readouts {

@@ -354,13 +354,14 @@ export function ResearchAtlas() {
         <div className="section-content">
           <p className="eyebrow">GPU-accelerated conditional forward model</p>
           <h2 id="simulation-title">
-            Five centuries of stellar evolution, with assumptions exposed.
+            Evolution through 3026 CE, with every assumption exposed.
           </h2>
           <p className="section-deck">
             The default branch renders atmospheric evolution without inserting a
-            supernova into the next 500 years. A separate disputed branch lets
-            the observer impose an arrival epoch from 2056–2326 CE and follow
-            shock breakout, ejecta expansion, and young-remnant evolution.
+            supernova through 3026 CE. A separate disputed branch lets the
+            observer impose an arrival epoch from 2056–2326 CE and follow shock
+            breakout, free expansion, wind-driven deceleration, and the
+            transition from young to evolved supernova remnant.
           </p>
           <Betelgeuse3DTimeline />
         </div>

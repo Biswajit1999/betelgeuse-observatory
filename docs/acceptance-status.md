@@ -24,7 +24,7 @@ This matrix defines the version 1.0 repository release. It separates completed s
 - [x] The continuum workbench provides bounded in-band predictions, standardized residuals, and an explicit incomplete-uncertainty warning.
 - [x] The local blink comparator supports large rendered-image sequences while refusing quantitative differencing without registered, beam-matched data.
 - [x] The signed author forecast states a preferred model family, a representative 202,026 CE point, the contested short-horizon branch, and falsifiers.
-- [x] The WebGL timeline provides high/efficient GPU modes, switchable measured near-infrared and ALMA emitting layers, a physics-coupled convection field, a 500-year received-time axis, and an explicitly imposed short-horizon explosion branch.
+- [x] The WebGL timeline provides high/efficient GPU modes, switchable measured near-infrared and ALMA emitting layers, a physics-coupled convection field, a 2026–3026 received-time axis, and an explicitly imposed short-horizon explosion branch.
 - [x] The stellar surface is coupled to a reduced spherical conservation-law gas solver with metric-aware derivatives, area-weighted diagnostics, advected temperature, density, horizontal/radial velocity, pressure gradients, buoyancy, viscosity, thermal diffusion, compressional heating, and radiative relaxation.
 - [x] The simulated ejecta radius and angular-size equations are unit-tested and remain separate from the logarithmically compressed visual scale.
 - [x] Browser visual QA passes at 375, 768, 1024, and 1440 px with no unintended horizontal clipping or console errors.

@@ -35,7 +35,7 @@ type HydroStats = {
 };
 
 const START_YEAR = 2026;
-const END_YEAR = 2526;
+const END_YEAR = 3026;
 const DEFAULT_COLLAPSE_YEAR = 2176;
 const DISTANCE_PC = 172;
 const STELLAR_MASS_SOLAR = 17.5;
@@ -92,6 +92,7 @@ const vertexShader = `
   varying vec3 vNormalWorld;
   varying vec3 vPosition;
   varying vec3 vObjectDirection;
+  varying vec2 vHydroUv;
   varying float vNoise;
   varying vec4 vHydro;
 
@@ -139,6 +140,7 @@ const vertexShader = `
     vec4 worldPosition = modelMatrix * vec4(displaced, 1.0);
     vNoise = broad * 0.88 + detail * 0.12;
     vHydro = hydro;
+    vHydroUv = uv;
     vObjectDirection = direction;
     vPosition = worldPosition.xyz;
     vNormalWorld = normalize(mat3(modelMatrix) * normal);
@@ -154,9 +156,12 @@ const fragmentShader = `
   uniform float uTemperatureSpan;
   uniform float uHotspotEnhancement;
   uniform float uLimbExponent;
+  uniform vec2 uHydroTexelSize;
+  uniform sampler2D uHydroMap;
   varying vec3 vNormalWorld;
   varying vec3 vPosition;
   varying vec3 vObjectDirection;
+  varying vec2 vHydroUv;
   varying float vNoise;
   varying vec4 vHydro;
 
@@ -179,11 +184,30 @@ const fragmentShader = `
 
   vec3 radioFalseColour(float normalizedTemperature) {
     vec3 low = vec3(0.12, 0.006, 0.002);
-    vec3 middle = vec3(0.82, 0.085, 0.008);
-    vec3 high = vec3(1.0, 0.63, 0.12);
+    vec3 middle = vec3(0.74, 0.065, 0.006);
+    vec3 high = vec3(0.96, 0.42, 0.045);
     float split = smoothstep(0.0, 0.62, normalizedTemperature);
     vec3 lower = mix(low, middle, split);
     return mix(lower, high, smoothstep(0.58, 1.0, normalizedTemperature));
+  }
+
+  float broadConvectiveCells(vec3 direction) {
+    // A handful of stellar-scale cells is more representative of Betelgeuse
+    // than solar-like granulation. The centres are a stable visual basis; the
+    // solved temperature and velocity fields provide the time dependence.
+    vec3 cellA = normalize(vec3(-0.48, 0.28, 0.83));
+    vec3 cellB = normalize(vec3(0.50, -0.24, 0.83));
+    vec3 cellC = normalize(vec3(0.12, 0.62, 0.77));
+    vec3 downflowA = normalize(vec3(0.02, 0.08, 1.0));
+    vec3 downflowB = normalize(vec3(-0.58, -0.42, 0.70));
+    float warmCells =
+      0.72 * exp(-5.2 * (1.0 - dot(direction, cellA))) +
+      0.58 * exp(-5.8 * (1.0 - dot(direction, cellB))) +
+      0.46 * exp(-6.4 * (1.0 - dot(direction, cellC)));
+    float coolLanes =
+      0.55 * exp(-7.2 * (1.0 - dot(direction, downflowA))) +
+      0.34 * exp(-8.0 * (1.0 - dot(direction, downflowB)));
+    return clamp(warmCells - coolLanes - 0.20, -0.72, 0.84);
   }
 
   void main() {
@@ -193,13 +217,21 @@ const fragmentShader = `
     float temperaturePerturbation = vHydro.r * 2.0 - 1.0;
     float upflow = vHydro.g * 2.0 - 1.0;
     float flowSpeed = vHydro.a;
-    float hydroStructure = temperaturePerturbation * 0.88 + (vNoise - 0.5) * 0.24;
+    float macroCells = broadConvectiveCells(vObjectDirection);
+    float hydroStructure = temperaturePerturbation * 0.76 +
+      macroCells * 0.72 + (vNoise - 0.5) * 0.16;
+    float thermalLeft = texture2D(uHydroMap, vHydroUv - vec2(uHydroTexelSize.x, 0.0)).r;
+    float thermalRight = texture2D(uHydroMap, vHydroUv + vec2(uHydroTexelSize.x, 0.0)).r;
+    float thermalDown = texture2D(uHydroMap, vHydroUv - vec2(0.0, uHydroTexelSize.y)).r;
+    float thermalUp = texture2D(uHydroMap, vHydroUv + vec2(0.0, uHydroTexelSize.y)).r;
+    float thermalGradient = abs(thermalRight - thermalLeft) + abs(thermalUp - thermalDown);
+    float intercellLane = smoothstep(0.012, 0.085, thermalGradient);
 
     vec3 northEast = normalize(vec3(-0.42, 0.48, 0.77));
     vec3 southWest = normalize(vec3(0.42, -0.48, 0.77));
-    float northEastSpot = exp(-18.0 * (1.0 - dot(vObjectDirection, northEast)));
-    float southWestSpot = exp(-24.0 * (1.0 - dot(vObjectDirection, southWest)));
-    float observedHotStructure = 0.78 * northEastSpot + 0.46 * southWestSpot;
+    float northEastSpot = exp(-34.0 * (1.0 - dot(vObjectDirection, northEast)));
+    float southWestSpot = exp(-42.0 * (1.0 - dot(vObjectDirection, southWest)));
+    float observedHotStructure = 0.84 * northEastSpot + 0.52 * southWestSpot;
 
     float temperatureK = uTemperatureBase +
       hydroStructure * uTemperatureSpan * (0.88 + 0.12 * uActivity);
@@ -208,6 +240,12 @@ const fragmentShader = `
     }
 
     float thermalIntensity = pow(temperatureK / uTemperatureBase, 4.0);
+    float visibleCellSignal = clamp(
+      temperaturePerturbation * 0.78 + macroCells * 0.88 +
+        (vNoise - 0.5) * 0.38,
+      -1.0,
+      1.0
+    );
     vec3 colour = continuumColour(temperatureK);
     if (uLayerMode > 0.5) {
       float normalizedRadioTemperature = clamp((temperatureK - 1700.0) / 1500.0, 0.0, 1.0);
@@ -216,10 +254,20 @@ const fragmentShader = `
 
     // Preserve chromatic and cell contrast instead of clipping the hotter
     // near-infrared continuum to a featureless white display surface.
-    colour *= mix(0.54, 1.0, uLayerMode);
+    colour *= mix(0.50, 1.0, uLayerMode);
+    vec3 nearInfraredCellColour = mix(
+      vec3(0.54, 0.20, 0.07),
+      vec3(1.0, 0.88, 0.48),
+      smoothstep(-0.82, 0.86, visibleCellSignal)
+    );
+    colour *= mix(nearInfraredCellColour, vec3(1.0), uLayerMode);
 
     float laneSuppression = 1.0 - 0.16 * flowSpeed * (0.5 - 0.5 * upflow);
-    colour *= thermalIntensity * laneSuppression * (0.28 + 0.72 * limb);
+    float cellBrightness = 0.68 + 0.58 *
+      smoothstep(-0.82, 0.86, visibleCellSignal);
+    colour *= thermalIntensity * laneSuppression * cellBrightness *
+      (1.0 - 0.24 * intercellLane) * (0.28 + 0.72 * limb);
+    colour *= mix(1.0, 0.70, uLayerMode);
     colour += vec3(0.05, 0.008, 0.001) * pow(1.0 - facing, 2.5);
 
     gl_FragColor = vec4(colour, uOpacity);
@@ -240,7 +288,7 @@ const shellVertexShader = `
   void main() {
     vec3 d = normalize(position);
     float cell = hash(floor(d * 28.0 + uTime * 0.04));
-    float displacement = (cell - 0.5) * 0.32;
+    float displacement = (cell - 0.5) * 0.012;
     vec3 p = position + normal * displacement;
     vFilament = cell;
     vNormalWorld = normalize(normalMatrix * normal);
@@ -257,7 +305,7 @@ const shellFragmentShader = `
     float rim = pow(1.0 - abs(dot(normalize(vNormalWorld), vec3(0.0, 0.0, 1.0))), 2.1);
     float filament = smoothstep(0.50, 0.86, vFilament);
     vec3 colour = mix(vec3(0.95, 0.055, 0.004), vec3(1.0, 0.72, 0.20), filament);
-    float alpha = (rim * 0.72 + filament * 0.20) * uOpacity;
+    float alpha = (rim * 0.96 + filament * 0.006) * uOpacity;
     gl_FragColor = vec4(colour, alpha);
   }
 `;
@@ -338,16 +386,32 @@ function timelinePhase(scenario: Scenario, year: number, collapseYear: number) {
       elapsed,
     };
   }
-  if (elapsed < 50) {
+  if (elapsed < 10) {
     return {
-      label: 'Expanding Type-II ejecta illustration',
+      label: 'Freely expanding Type-II ejecta illustration',
+      short: `${elapsed.toFixed(0)} yr after imposed collapse`,
+      activity: 0,
+      elapsed,
+    };
+  }
+  if (elapsed < 100) {
+    return {
+      label: 'Forward shock interacting with the stellar wind',
+      short: `${elapsed.toFixed(0)} yr after imposed collapse`,
+      activity: 0,
+      elapsed,
+    };
+  }
+  if (elapsed < 400) {
+    return {
+      label: 'Young supernova remnant · decelerating shell',
       short: `${elapsed.toFixed(0)} yr after imposed collapse`,
       activity: 0,
       elapsed,
     };
   }
   return {
-    label: 'Young remnant · ballistic scale shown',
+    label: 'Evolved remnant · wind-decelerated scale shown',
     short: `${elapsed.toFixed(0)} yr after imposed collapse`,
     activity: 0,
     elapsed,
@@ -583,6 +647,9 @@ export function Betelgeuse3DTimeline() {
         uTemperatureSpan: { value: 480 },
         uHotspotEnhancement: { value: ALMA_HOTSPOT_ENHANCEMENT_K },
         uLimbExponent: { value: 0.097 },
+        uHydroTexelSize: {
+          value: new THREE.Vector2(1 / hydroWidth, 1 / hydroHeight),
+        },
         uHydroMap: { value: hydroTexture },
       },
       vertexShader,
@@ -840,6 +907,7 @@ export function Betelgeuse3DTimeline() {
           : Math.max(0, 1 - elapsed / 1.8)
         : 1;
       starMaterial.uniforms.uOpacity.value = starOpacity;
+      star.visible = starOpacity > 0.005;
       star.scale.setScalar(
         layerScale * (exploded ? Math.max(0.08, 1 - elapsed / 2.2) : 1),
       );
@@ -858,26 +926,29 @@ export function Betelgeuse3DTimeline() {
       plumes.scale.setScalar(exploded ? 1 + Math.min(elapsed, 5) * 0.24 : 1);
 
       shell.visible = exploded;
-      ejecta.visible = exploded;
+      ejecta.visible = exploded && elapsed < 500;
       if (exploded) {
-        const visualExpansion = 1 + Math.log1p(Math.max(elapsed, 0.02)) * 0.34;
+        const visualExpansion = 1 + Math.log1p(Math.max(elapsed, 0.02)) * 0.04;
         shell.scale.setScalar(visualExpansion);
         ejecta.scale.setScalar(visualExpansion * 0.98);
         shellMaterial.uniforms.uOpacity.value = breakout
           ? 1
-          : Math.max(0.18, 0.92 - Math.log1p(elapsed) * 0.12);
+          : Math.max(0.18, 0.72 - Math.log1p(elapsed) * 0.1);
         ejectaMaterial.opacity = breakout
           ? 0.92
-          : Math.max(0.16, 0.76 - Math.log1p(elapsed) * 0.09);
-        glow.scale.setScalar(breakout ? 13 : 6.8 + Math.log1p(elapsed) * 0.82);
+          : Math.max(0.03, 0.68 - Math.log1p(elapsed) * 0.1);
+        glow.scale.setScalar(breakout ? 13 : 5.8 + Math.log1p(elapsed) * 0.22);
         glowMaterial.opacity = breakout
           ? 1
-          : Math.max(0.11, 0.66 - Math.log1p(elapsed) * 0.09);
-        bloom.strength = breakout ? 2.4 : 1.25;
+          : Math.max(0.015, 0.52 - Math.log1p(elapsed) * 0.075);
+        bloom.strength = breakout ? 2.4 : 0.78;
       } else {
         glow.scale.setScalar(5.7 * layerScale);
         glowMaterial.opacity = 0.13 + currentPhase.activity * 0.02;
-        bloom.strength = 0.32 + currentPhase.activity * 0.08;
+        bloom.strength =
+          currentObservationLayer === 'alma-band7'
+            ? 0.18
+            : 0.32 + currentPhase.activity * 0.08;
       }
       remnantMaterial.opacity = exploded ? Math.min(1, elapsed / 8) : 0;
       remnant.scale.setScalar(
@@ -938,7 +1009,7 @@ export function Betelgeuse3DTimeline() {
           <span className="evidence-tag simulated">
             Physics-coupled GPU rendering
           </span>
-          <h3>Betelgeuse: conditional 500-year visual evolution</h3>
+          <h3>Betelgeuse: conditional evolution through 3026 CE</h3>
         </div>
         <label className="stellar-quality-control">
           Rendering quality
@@ -967,7 +1038,7 @@ export function Betelgeuse3DTimeline() {
             setPlaying(false);
           }}
         >
-          Preferred model · no collapse in 500 yr
+          Preferred model · no collapse through 3026 CE
         </button>
         <button
           type="button"
@@ -1103,9 +1174,11 @@ export function Betelgeuse3DTimeline() {
           <span className="evidence-tag measured">Continuum surface</span>
           <strong>42.49 ± 0.06 mas · 3690 ± 54 K</strong>
           <p>
-            Near-infrared limb-darkened diameter and continuum-forming
-            temperature.{' '}
+            A limb-darkened global disk with few-percent H-band asymmetry and
+            resolved bright structure—not a perfectly smooth surface.{' '}
             <a href="https://arxiv.org/abs/1104.0958">Ohnaka et al. 2011</a>
+            {' · '}
+            <a href="https://arxiv.org/abs/0910.4167">Haubois et al. 2009</a>
           </p>
         </article>
         <article>
@@ -1244,7 +1317,7 @@ export function Betelgeuse3DTimeline() {
           Coefficients are nondimensional surface-layer closures. They alter the
           solved flow field rather than merely changing colour. The worker maps
           one numerical step to 0.25 accelerated surface day; it is not
-          synchronized to the compressed 500-year evolutionary slider.
+          synchronized to the compressed 1000-year evolutionary slider.
         </p>
       </section>
 
@@ -1296,7 +1369,7 @@ export function Betelgeuse3DTimeline() {
           }}
         />
         <div className="stellar-timeline-ticks" aria-hidden="true">
-          {[2026, 2056, 2126, 2226, 2326, 2526].map((tick) => (
+          {[2026, 2056, 2176, 2326, 2526, 2776, 3026].map((tick) => (
             <span key={tick}>{tick}</span>
           ))}
         </div>
@@ -1387,7 +1460,7 @@ export function Betelgeuse3DTimeline() {
         false-colour; opacity, line formation, ionisation, deep stratification,
         shock capturing, magnetic fields, dust radiative transfer and calibrated
         boundary conditions remain unresolved. The preferred model does not
-        predict core collapse anywhere on this 500-year timeline.
+        predict core collapse anywhere on this timeline through 3026 CE.
       </p>
     </div>
   );

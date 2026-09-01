@@ -189,7 +189,7 @@ function integrate() {
           dt *
             ((-pressureStrength * pressureGradientX) /
               Math.max(advectedDensity, 0.65) -
-              horizontalThermalExpansion * temperatureGradientX +
+              horizontalThermalExpansion * temperatureGradientX -
               drag * advectedU +
               parameters.viscosity *
                 sphericalLaplacian(velocityX, x, y, latitude)),
