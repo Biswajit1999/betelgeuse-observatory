@@ -64,6 +64,7 @@ The complete first-person scientific and engineering write-up is available as [L
 - A two-piece-normal Monte Carlo distance posterior: 172 pc with +13 / -11 pc uncertainty.
 - A typed Python science package with tested light-time, angular-size, and continuum calculations.
 - Reproduction of the simple three-point ALMA integrated-flux fit, `alpha = 1.49 +/- 0.13`.
+- A reproducible [ALMA continuum validation](docs/alma-continuum-validation.md) with Monte Carlo error propagation, leave-one-band-out leverage, brightness-temperature trend, machine-readable outputs, and publication-style figures.
 - A real 1836--2026 brightness history: 27 Herschel-era reconstructed estimates plus 51,460 quality-screened AAVSO detections, with visual and Johnson V measurements plotted separately.
 - Interactive Band 8 contour, axisymmetric-residual, and matched-beam radial-profile reconstructions following the published figure conventions while clearly separating fitted reconstructions from observed pixels.
 - An interactive in-band continuum forecast with standardized residuals and explicit incomplete-uncertainty warning.

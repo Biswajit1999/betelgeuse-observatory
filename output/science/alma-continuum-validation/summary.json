@@ -1,0 +1,23 @@
+{
+  "data_kind": "published real ALMA 2023 integrated continuum measurements",
+  "full_weighted_fit": {
+    "spectral_index": 1.4935739283193692,
+    "formal_sigma": 0.13334947042751563
+  },
+  "monte_carlo": {
+    "requested_draws": 20000,
+    "accepted_draws": 20000,
+    "seed": 20261012,
+    "median": 1.5030488635800592,
+    "p16": 1.365891604980989,
+    "p84": 1.6342530849502208,
+    "probability_alpha_below_2": 1.0
+  },
+  "brightness_temperature_trend": {
+    "slope_k_per_ln_ghz": -98.49694553811496,
+    "intercept_k": 2872.5154332586453,
+    "rms_residual_k": 3.5141855265469917,
+    "range_k": 76.0
+  },
+  "limitations": "Only three literature points are available. Quoted flux errors are treated as independent Gaussian uncertainties; shared calibration covariance is unavailable. Bands were not simultaneous and sample different apparent diameters. This is a sanity and leverage audit, not a spatially resolved spectral-index measurement."
+}
