@@ -2,15 +2,17 @@
 
 from __future__ import annotations
 
+from collections.abc import Sequence
+
 import numpy as np
 
 from .continuum import fit_power_law
 
 
 def monte_carlo_spectral_index(
-    frequency_ghz,
-    flux_jy,
-    flux_sigma_jy,
+    frequency_ghz: Sequence[float],
+    flux_jy: Sequence[float],
+    flux_sigma_jy: Sequence[float],
     *,
     draws: int = 20000,
     seed: int = 20261012,
@@ -22,7 +24,12 @@ def monte_carlo_spectral_index(
     rng = np.random.default_rng(seed)
     samples = rng.normal(flux, sigma, size=(draws, len(flux)))
     samples = samples[np.all(samples > 0, axis=1)]
-    alpha = np.array([fit_power_law(frequency, row, sigma).spectral_index for row in samples])
+    alpha = np.array(
+        [
+            fit_power_law(frequency.tolist(), row.tolist(), sigma.tolist()).spectral_index
+            for row in samples
+        ]
+    )
     return {
         "requested_draws": draws,
         "accepted_draws": len(alpha),
@@ -34,7 +41,11 @@ def monte_carlo_spectral_index(
     }
 
 
-def leave_one_out_slopes(frequency_ghz, flux_jy, flux_sigma_jy) -> list[dict]:
+def leave_one_out_slopes(
+    frequency_ghz: Sequence[float],
+    flux_jy: Sequence[float],
+    flux_sigma_jy: Sequence[float],
+) -> list[dict[str, float]]:
     """Fit every two-band subset to expose leverage in the three-point slope."""
     frequency = np.asarray(frequency_ghz, dtype=float)
     flux = np.asarray(flux_jy, dtype=float)
@@ -42,7 +53,7 @@ def leave_one_out_slopes(frequency_ghz, flux_jy, flux_sigma_jy) -> list[dict]:
     rows = []
     for omitted in range(len(frequency)):
         keep = np.arange(len(frequency)) != omitted
-        fit = fit_power_law(frequency[keep], flux[keep], sigma[keep])
+        fit = fit_power_law(frequency[keep].tolist(), flux[keep].tolist(), sigma[keep].tolist())
         rows.append(
             {
                 "omitted_frequency_ghz": float(frequency[omitted]),
@@ -53,7 +64,9 @@ def leave_one_out_slopes(frequency_ghz, flux_jy, flux_sigma_jy) -> list[dict]:
     return rows
 
 
-def brightness_temperature_trend(frequency_ghz, temperature_k) -> dict[str, float]:
+def brightness_temperature_trend(
+    frequency_ghz: Sequence[float], temperature_k: Sequence[float]
+) -> dict[str, float]:
     """Fit a descriptive temperature trend against log frequency."""
     x = np.log(np.asarray(frequency_ghz, dtype=float))
     y = np.asarray(temperature_k, dtype=float)
