@@ -1,0 +1,161 @@
+{
+  "schema": 1,
+  "project": "Betelgeuse Observatory",
+  "repository": "https://github.com/Biswajit1999/betelgeuse-observatory",
+  "files": [
+    {
+      "label": "Alma 2023 continuum",
+      "path": "data/samples/alma_2023_continuum.csv",
+      "role": "Data and provenance",
+      "bytes": 362,
+      "sha256": "fa24c4e375424e9fecb28aff091f427b7d54f36d3c3ba5e9e05c0c8b875c3da2",
+      "hash_basis": "LF-normalised text",
+      "format": "CSV",
+      "rows": 3,
+      "columns": 7,
+      "headers": [
+        "frequency_ghz",
+        "integrated_flux_jy",
+        "flux_uncertainty_jy",
+        "angular_diameter_mas",
+        "brightness_temperature_k",
+        "observation_date",
+        "source"
+      ],
+      "preview": [
+        [
+          "223.55",
+          "0.28",
+          "0.014",
+          "62.14",
+          "2342",
+          "2023-08-03/2023-08-27",
+          "https://arxiv.org/abs/2608.19339"
+        ],
+        [
+          "337.99",
+          "0.51",
+          "0.04",
+          "57.74",
+          "2294",
+          "2023-08-03/2023-08-04",
+          "https://arxiv.org/abs/2608.19339"
+        ],
+        [
+          "485.22",
+          "0.90",
+          "0.09",
+          "54.30",
+          "2266",
+          "2023-08-01",
+          "https://arxiv.org/abs/2608.19339"
+        ]
+      ]
+    },
+    {
+      "label": "Betelgeuse historical lightcurve",
+      "path": "data/samples/betelgeuse_historical_lightcurve.json",
+      "role": "Data and provenance",
+      "bytes": 289202,
+      "sha256": "e0f9a84331ddd00f0709c8410007fa891982d72d236f3d130c384939c977519b",
+      "hash_basis": "LF-normalised text",
+      "format": "JSON",
+      "keys": [
+        "metadata",
+        "herschel",
+        "overview",
+        "recent"
+      ],
+      "arrays": {
+        "herschel": 27,
+        "overview": 592,
+        "recent": 343
+      }
+    },
+    {
+      "label": "Betelgeuse historical photometry 1836 2026",
+      "path": "public/downloads/betelgeuse-historical-photometry-1836-2026.csv",
+      "role": "Data and provenance",
+      "bytes": 107297,
+      "sha256": "1b804b6b95e7f28b13b1414ae1773c11a62671b7860894972ad88bba5202fd71",
+      "hash_basis": "LF-normalised text",
+      "format": "CSV",
+      "rows": 962,
+      "columns": 14,
+      "headers": [
+        "view",
+        "series",
+        "band",
+        "bin_days",
+        "start_jd",
+        "end_jd",
+        "mid_jd"
+      ],
+      "preview": [
+        [
+          "historical point",
+          "Herschel estimates (Lloyd 2020 reconstruction)",
+          "historical visual",
+          "0",
+          "2391726.0",
+          "2391726.0",
+          "2391726.0"
+        ],
+        [
+          "historical point",
+          "Herschel estimates (Lloyd 2020 reconstruction)",
+          "historical visual",
+          "0",
+          "2391961.0",
+          "2391961.0",
+          "2391961.0"
+        ],
+        [
+          "historical point",
+          "Herschel estimates (Lloyd 2020 reconstruction)",
+          "historical visual",
+          "0",
+          "2391962.0",
+          "2391962.0",
+          "2391962.0"
+        ],
+        [
+          "historical point",
+          "Herschel estimates (Lloyd 2020 reconstruction)",
+          "historical visual",
+          "0",
+          "2391975.0",
+          "2391975.0",
+          "2391975.0"
+        ]
+      ]
+    },
+    {
+      "label": "Betelgeuse historical photometry README",
+      "path": "public/downloads/betelgeuse-historical-photometry-README.txt",
+      "role": "Data and provenance",
+      "bytes": 814,
+      "sha256": "454eac937f2042e7ad1dd3841fa129ccdbb1413933828dee41bd8dfef3ce0cfb",
+      "hash_basis": "LF-normalised text",
+      "format": "TXT"
+    },
+    {
+      "label": "Notes for public/observations",
+      "path": "public/observations/README.md",
+      "role": "Data and provenance",
+      "bytes": 898,
+      "sha256": "c1f79b0fcd5b1bc6cd1cbacc444e3210f88c98b571c87742f505d1cd0ab3f42a",
+      "hash_basis": "LF-normalised text",
+      "format": "MD"
+    },
+    {
+      "label": "Notes for public/observations/blink-test",
+      "path": "public/observations/blink-test/README.md",
+      "role": "Data and provenance",
+      "bytes": 1172,
+      "sha256": "06f93d86dbc718a9c65f8aa7c2ada18653d575d7d9c399f9ad8c8381d43d7b4a",
+      "hash_basis": "LF-normalised text",
+      "format": "MD"
+    }
+  ]
+}

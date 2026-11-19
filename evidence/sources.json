@@ -1,0 +1,36 @@
+{
+  "project": "Betelgeuse Observatory",
+  "repository": "https://github.com/Biswajit1999/betelgeuse-observatory",
+  "files": [
+    {
+      "label": "Alma 2023 continuum",
+      "path": "data/samples/alma_2023_continuum.csv",
+      "role": "Data and provenance"
+    },
+    {
+      "label": "Betelgeuse historical lightcurve",
+      "path": "data/samples/betelgeuse_historical_lightcurve.json",
+      "role": "Data and provenance"
+    },
+    {
+      "label": "Betelgeuse historical photometry 1836 2026",
+      "path": "public/downloads/betelgeuse-historical-photometry-1836-2026.csv",
+      "role": "Data and provenance"
+    },
+    {
+      "label": "Betelgeuse historical photometry README",
+      "path": "public/downloads/betelgeuse-historical-photometry-README.txt",
+      "role": "Data and provenance"
+    },
+    {
+      "label": "Notes for public/observations",
+      "path": "public/observations/README.md",
+      "role": "Data and provenance"
+    },
+    {
+      "label": "Notes for public/observations/blink-test",
+      "path": "public/observations/blink-test/README.md",
+      "role": "Data and provenance"
+    }
+  ]
+}
