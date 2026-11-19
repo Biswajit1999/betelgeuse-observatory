@@ -287,3 +287,17 @@ The static export is browser-checked at 375, 768, 1024, and 1440 px. Generated r
 ## Citation
 
 Use [`CITATION.cff`](CITATION.cff) to cite Biswajit Jana's software and cite each underlying observatory dataset and paper used in an analysis.
+
+## Research evidence and downloads
+
+- [Download the machine-readable table profiles](evidence/table-profiles.json) for 2 archived tables. Open `table-evidence.html` from the checkout for the coverage chart.
+- Start with [Alma 2023 continuum](data/samples/alma_2023_continuum.csv), [Betelgeuse historical lightcurve](data/samples/betelgeuse_historical_lightcurve.json), [Betelgeuse historical photometry 1836 2026](public/downloads/betelgeuse-historical-photometry-1836-2026.csv).
+
+Run these commands from the repository root to rebuild the published evidence.
+
+```sh
+python scripts/evidence_catalog.py
+python scripts/render_evidence_page.py
+python scripts/profile_evidence_tables.py
+python scripts/render_table_profiles.py
+```
