@@ -1,0 +1,202 @@
+{
+  "schema": 1,
+  "project": "Betelgeuse Observatory",
+  "tables": [
+    {
+      "path": "data/samples/alma_2023_continuum.csv",
+      "label": "Alma 2023 continuum",
+      "role": "Data and provenance",
+      "rows": 3,
+      "width_mismatches": 0,
+      "columns": [
+        {
+          "name": "frequency_ghz",
+          "blank": 0,
+          "text": 0,
+          "finite": 3,
+          "nonfinite": 0,
+          "minimum": 223.55,
+          "maximum": 485.22
+        },
+        {
+          "name": "integrated_flux_jy",
+          "blank": 0,
+          "text": 0,
+          "finite": 3,
+          "nonfinite": 0,
+          "minimum": 0.28,
+          "maximum": 0.9
+        },
+        {
+          "name": "flux_uncertainty_jy",
+          "blank": 0,
+          "text": 0,
+          "finite": 3,
+          "nonfinite": 0,
+          "minimum": 0.014,
+          "maximum": 0.09
+        },
+        {
+          "name": "angular_diameter_mas",
+          "blank": 0,
+          "text": 0,
+          "finite": 3,
+          "nonfinite": 0,
+          "minimum": 54.3,
+          "maximum": 62.14
+        },
+        {
+          "name": "brightness_temperature_k",
+          "blank": 0,
+          "text": 0,
+          "finite": 3,
+          "nonfinite": 0,
+          "minimum": 2266.0,
+          "maximum": 2342.0
+        },
+        {
+          "name": "observation_date",
+          "blank": 0,
+          "text": 3,
+          "finite": 0,
+          "nonfinite": 0
+        },
+        {
+          "name": "source",
+          "blank": 0,
+          "text": 3,
+          "finite": 0,
+          "nonfinite": 0
+        }
+      ]
+    },
+    {
+      "path": "public/downloads/betelgeuse-historical-photometry-1836-2026.csv",
+      "label": "Betelgeuse historical photometry 1836 2026",
+      "role": "Data and provenance",
+      "rows": 962,
+      "width_mismatches": 0,
+      "columns": [
+        {
+          "name": "view",
+          "blank": 0,
+          "text": 962,
+          "finite": 0,
+          "nonfinite": 0
+        },
+        {
+          "name": "series",
+          "blank": 0,
+          "text": 962,
+          "finite": 0,
+          "nonfinite": 0
+        },
+        {
+          "name": "band",
+          "blank": 0,
+          "text": 962,
+          "finite": 0,
+          "nonfinite": 0
+        },
+        {
+          "name": "bin_days",
+          "blank": 0,
+          "text": 0,
+          "finite": 962,
+          "nonfinite": 0,
+          "minimum": 0.0,
+          "maximum": 90.0
+        },
+        {
+          "name": "start_jd",
+          "blank": 0,
+          "text": 0,
+          "finite": 962,
+          "nonfinite": 0,
+          "minimum": 2391726.0,
+          "maximum": 2461257.5
+        },
+        {
+          "name": "end_jd",
+          "blank": 0,
+          "text": 0,
+          "finite": 962,
+          "nonfinite": 0,
+          "minimum": 2391726.0,
+          "maximum": 2461300.0
+        },
+        {
+          "name": "mid_jd",
+          "blank": 0,
+          "text": 0,
+          "finite": 962,
+          "nonfinite": 0,
+          "minimum": 2391726.0,
+          "maximum": 2461275.0
+        },
+        {
+          "name": "year",
+          "blank": 0,
+          "text": 0,
+          "finite": 962,
+          "nonfinite": 0,
+          "minimum": 1836.22268,
+          "maximum": 2026.63973
+        },
+        {
+          "name": "magnitude",
+          "blank": 0,
+          "text": 0,
+          "finite": 962,
+          "nonfinite": 0,
+          "minimum": -0.1,
+          "maximum": 1.583
+        },
+        {
+          "name": "q1",
+          "blank": 0,
+          "text": 0,
+          "finite": 962,
+          "nonfinite": 0,
+          "minimum": -0.225,
+          "maximum": 1.521
+        },
+        {
+          "name": "q3",
+          "blank": 0,
+          "text": 0,
+          "finite": 962,
+          "nonfinite": 0,
+          "minimum": -0.1,
+          "maximum": 1.6295
+        },
+        {
+          "name": "mad",
+          "blank": 0,
+          "text": 0,
+          "finite": 962,
+          "nonfinite": 0,
+          "minimum": 0.0,
+          "maximum": 0.4
+        },
+        {
+          "name": "n",
+          "blank": 0,
+          "text": 0,
+          "finite": 962,
+          "nonfinite": 0,
+          "minimum": 1.0,
+          "maximum": 2296.0
+        },
+        {
+          "name": "uncertain",
+          "blank": 935,
+          "text": 27,
+          "finite": 0,
+          "nonfinite": 0
+        }
+      ]
+    }
+  ],
+  "excluded": []
+}
